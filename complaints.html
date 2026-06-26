@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshay Patra - All Complaints</title>
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f4f7f5;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: 260px;
+            background-color: #064e35;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #ffffff;
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #e0f0e8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu li.active a,
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-left: 4px solid #8dc63f;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-logout {
+            width: 100%;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* --- MAIN CONTENT WINDOW --- */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #064e35;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        /* --- FILTERS SECTION --- */
+        .filter-section {
+            background: white;
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+            margin-bottom: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            color: #333;
+            min-width: 180px;
+        }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: #064e35;
+        }
+
+        /* --- DATA TABLE --- */
+        .table-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            font-size: 14px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background-color: #f8faf9;
+            color: #555;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #fdfdfd;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background-color: #fff8e6;
+            color: #f0ad4e;
+        }
+
+        .status-resolved {
+            background-color: #f1f9ec;
+            color: #5cb85c;
+        }
+
+        .btn-action {
+            color: #064e35;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-action:hover {
+            color: #8dc63f;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand,
+            .sidebar-menu span,
+            .btn-logout span,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .sidebar-menu li a {
+                justify-content: center;
+                padding: 20px 0;
+            }
+
+            .sidebar-menu li a i {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="image.png" alt="Akshaya Patra Logo" class="sidebar-logo">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
+            <li class="active"><a href="complaints.html"><i class="fa-regular fa-clipboard"></i>
+                    <span>Complaints</span></a></li>
+            <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="header">
+            <h1>Complaints Registry</h1>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filter-section">
+            <div class="filter-group">
+                <label>Search</label>
+                <input type="text" placeholder="Search by ID or Subject...">
+            </div>
+            <div class="filter-group">
+                <label>Department</label>
+                <select>
+                    <option value="all">All Departments</option>
+                    <option value="it">IT Department</option>
+                    <option value="electric">Electric Department</option>
+                    <option value="maintenance">Maintenance Department</option>
+                    <option value="kitchen">Kitchen / Production</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Status</label>
+                <select>
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="resolved">Resolved</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- COMPLAINTS TABLE -->
+        <div class="table-section">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Complaint ID</th>
+                        <th>Department</th>
+                        <th>Subject</th>
+                        <th>Date Registered</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#CPM-9021</td>
+                        <td>Kitchen / Production</td>
+                        <td>Raw material delivery delay</td>
+                        <td>26 June 2026</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
+                                View</a></td>
+                    </tr>
+                    <tr>
+                        <td>#CPM-9019</td>
+                        <td>IT Department</td>
+                        <td>Main server internet down</td>
+                        <td>25 June 2026</td>
+                        <td><span class="status-badge status-resolved">Resolved</span></td>
+                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
+                                View</a></td>
+                    </tr>
+                    <tr>
+                        <td>#CPM-9018</td>
+                        <td>Electric Department</td>
+                        <td>Generator backup check needed</td>
+                        <td>24 June 2026</td>
+                        <td><span class="status-badge status-resolved">Resolved</span></td>
+                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
+                                View</a></td>
+                    </tr>
+                    <tr>
+                        <td>#CPM-9015</td>
+                        <td>Maintenance Department</td>
+                        <td>Cold storage room door alignment</td>
+                        <td>22 June 2026</td>
+                        <td><span class="status-badge status-pending">Pending</span></td>
+                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
+                                View</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshay Patra - Complaint Details</title>
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            background-color: #f4f7f5;
+            min-height: 100vh;
+        }
+
+        /* --- SIDEBAR NAVIGATION --- */
+        .sidebar {
+            width: 260px;
+            background-color: #064e35;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #ffffff;
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            max-width: 180px;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: #e0f0e8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu li.active a,
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border-left: 4px solid #8dc63f;
+        }
+
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-logout {
+            width: 100%;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 260px;
+            flex: 1;
+            padding: 40px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .btn-back {
+            background-color: white;
+            color: #064e35;
+            border: 1px solid #064e35;
+            padding: 8px 14px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.3s;
+        }
+
+        .btn-back:hover {
+            background-color: #064e35;
+            color: white;
+        }
+
+        .header h1 {
+            color: #064e35;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        /* --- DETAILS LAYOUT --- */
+        .details-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+
+        .main-info-card,
+        .status-action-card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        .complaint-title-block {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .complaint-id {
+            font-size: 14px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .complaint-subject {
+            font-size: 22px;
+            color: #064e35;
+            font-weight: 700;
+            margin-top: 5px;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .meta-item label {
+            font-size: 12px;
+            color: #777;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .meta-item p {
+            font-size: 15px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .description-block label {
+            font-size: 12px;
+            color: #777;
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .description-text {
+            background-color: #f8faf9;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.6;
+            border-left: 4px solid #064e35;
+        }
+
+        /* --- ACTION CARD RIGHTS --- */
+        .status-action-card h3 {
+            color: #064e35;
+            font-size: 18px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .status-badge-large {
+            display: block;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 25px;
+        }
+
+        .status-pending {
+            background-color: #fff8e6;
+            color: #f0ad4e;
+        }
+
+        .status-resolved {
+            background-color: #f1f9ec;
+            color: #5cb85c;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            resize: none;
+        }
+
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #064e35;
+        }
+
+        .btn-update {
+            width: 100%;
+            background-color: #064e35;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-update:hover {
+            background-color: #0c694a;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand,
+            .sidebar-menu span,
+            .btn-logout span,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+
+            .details-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="image.png" alt="Akshaya Patra Logo" class="sidebar-logo">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
+            <li class="active"><a href="complaints.html"><i class="fa-regular fa-clipboard"></i>
+                    <span>Complaints</span></a></li>
+            <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <div class="header">
+            <a href="complaints.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Back</a>
+            <h1>Complaint Investigation</h1>
+        </div>
+
+        <div class="details-container">
+            <!-- LEFT PANEL: DETAILS -->
+            <div class="main-info-card">
+                <div class="complaint-title-block">
+                    <span class="complaint-id">Complaint ID: #CPM-9021</span>
+                    <h2 class="complaint-subject">Raw material delivery delay</h2>
+                </div>
+
+                <div class="meta-grid">
+                    <div class="meta-item">
+                        <label>Department Assigned</label>
+                        <p>Kitchen / Production</p>
+                    </div>
+                    <div class="meta-item">
+                        <label>Date Registered</label>
+                        <p>26 June 2026</p>
+                    </div>
+                </div>
+
+                <div class="description-block">
+                    <label>Detailed Issue Description</label>
+                    <div class="description-text">
+                        The raw materials required for tomorrow morning's batch preparation (specifically vegetables and
+                        spices) haven't arrived from the main supplier yet. The delivery was scheduled for 4:00 PM
+                        today. Kitchen supervisors are waiting to start sorting and pre-processing tasks.
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: ACTION & UPDATE STATUS -->
+            <div class="status-action-card">
+                <h3>Current Status</h3>
+                <span class="status-badge-large status-pending">Pending</span>
+
+                <form id="statusForm">
+                    <div class="form-group">
+                        <label for="statusSelect">Change Status</label>
+                        <select id="statusSelect">
+                            <option value="pending">Pending</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="remarks">Admin Remarks / Action Taken</label>
+                        <textarea id="remarks" rows="4"
+                            placeholder="Type resolution note or status comment..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-update">Update Complaint</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript to Handle Update Demo Feedback -->
+    <script>
+        document.getElementById('statusForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            alert('Complaint status updated successfully! (This logic will be handled dynamically with PHP later)');
+        });
+    </script>
+
+</body>
+
+</html>

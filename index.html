@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akshay Patra - Admin & Department Login</title>
+    <!-- Font Awesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f5;
+            padding: 20px;
+        }
+
+        .main-wrapper {
+            display: flex;
+            width: 100%;
+            max-width: 1050px;
+            height: 650px;
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .left-panel {
+            flex: 1.1;
+            background-color: #064e35;
+            background: linear-gradient(135deg, rgba(6, 66, 44, 0.15) 0%, rgba(9, 79, 54, 0.15) 100%), url('logo.png') no-repeat;
+            background-size: 100% 100%;
+            background-position: center;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+        }
+
+        .welcome-content {
+            max-width: 400px;
+            z-index: 2;
+            margin-top: -30px;
+        }
+
+        .welcome-content h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .welcome-content h1 span {
+            color: #8dc63f;
+        }
+
+        .welcome-content .divider {
+            width: 40px;
+            height: 3px;
+            background-color: #8dc63f;
+            margin-bottom: 20px;
+        }
+
+        .welcome-content .description {
+            font-size: 14px;
+            color: #e0f0e8;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .features-list {
+            list-style: none;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: #f0f7f4;
+        }
+
+        .features-list li i {
+            margin-right: 12px;
+            font-size: 16px;
+            color: #8dc63f;
+            width: 20px;
+            text-align: center;
+        }
+
+        .right-panel {
+            flex: 0.9;
+            background-color: #f8faf9;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 30px 35px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+            text-align: center;
+        }
+
+        .avatar-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #eaf4f0;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 10px;
+            color: #064e35;
+            font-size: 20px;
+        }
+
+        .login-card h2 {
+            color: #064e35;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .shield-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            color: #8dc63f;
+        }
+
+        .shield-line::before,
+        .shield-line::after {
+            content: "";
+            height: 1px;
+            width: 40px;
+            background-color: #ddd;
+            margin: 0 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .input-field-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-field-wrapper i.input-icon {
+            position: absolute;
+            left: 15px;
+            color: #888;
+        }
+
+        .input-field-wrapper i.toggle-password {
+            position: absolute;
+            right: 15px;
+            color: #888;
+            cursor: pointer;
+        }
+
+        .input-field-wrapper input {
+            width: 100%;
+            padding: 9px 15px 9px 45px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .input-field-wrapper input:focus {
+            border-color: #064e35;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            color: #555;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            margin-right: 6px;
+        }
+
+        .forgot-pass {
+            color: #064e35;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .btn-login {
+            width: 100%;
+            background-color: #064e35;
+            color: white;
+            border: none;
+            padding: 11px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .or-separator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 12px 0;
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .or-separator::before,
+        .or-separator::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background-color: #e0e0e0;
+            margin: 0 10px;
+        }
+
+        .btn-website {
+            width: 100%;
+            background-color: transparent;
+            color: #064e35;
+            border: 1px solid #064e35;
+            padding: 9px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-text {
+            margin-top: 20px;
+            font-size: 11px;
+            color: #666;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .footer-text span {
+            color: #064e35;
+            font-weight: 600;
+        }
+
+        @media (max-width: 900px) {
+            .left-panel {
+                display: none;
+            }
+
+            .right-panel {
+                flex: 1;
+                background-color: #ffffff;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-wrapper">
+        <div class="left-panel">
+            <div class="welcome-content">
+                <h1>Welcome Back,<br><span>Portal!</span></h1>
+                <div class="divider"></div>
+                <p class="description">Login to access and manage complaints, track status and take necessary actions.
+                </p>
+
+                <ul class="features-list">
+                    <li><i class="fa-regular fa-clipboard"></i> View & Manage Complaints</li>
+                    <li><i class="fa-solid fa-chart-line"></i> Track Complaint Status</li>
+                    <li><i class="fa-regular fa-circle-check"></i> Update & Resolve Issues</li>
+                    <li><i class="fa-regular fa-user"></i> Manage Profile & Settings</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="login-card">
+                <div class="avatar-icon"><i class="fa-regular fa-user"></i></div>
+                <h2>Portal Login</h2>
+                <div class="shield-line"><i class="fa-solid fa-shield-halved"></i></div>
+                <p class="subtitle">Please enter your credentials to continue</p>
+
+                <form>
+                    <div class="input-group">
+                        <label for="username">Username</label>
+                        <div class="input-field-wrapper">
+                            <i class="fa-regular fa-user input-icon"></i>
+                            <input type="text" id="username" placeholder="Enter your username" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-field-wrapper">
+                            <i class="fa-solid fa-lock input-icon"></i>
+                            <input type="password" id="password" placeholder="Enter your password" required>
+                            <i class="fa-regular fa-eye-slash toggle-password"></i>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="remember-me"><input type="checkbox"> Remember me</label>
+                        <a href="#" class="forgot-pass">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="btn-login"><i class="fa-solid fa-right-to-bracket"></i> Login</button>
+                    <div class="or-separator">or</div>
+                    <button type="button" class="btn-website"><i class="fa-solid fa-globe"></i> Back to Website</button>
+                </form>
+            </div>
+
+            <div class="footer-text">
+                © 2025 Akshay Patra Foundation. All rights reserved.<br>
+                <span>Unlimited food for education.</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const togglePassword = document.querySelector('.toggle-password');
+        const passwordInput = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('fa-eye');
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        const loginForm = document.querySelector('form');
+        loginForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const username = document.querySelector('#username').value.trim();
+            const password = passwordInput.value;
+
+            // 1. Super Admin
+            if (username === 'admin' && password === '1234') {
+                window.location.href = 'dashboard.html';
+            }
+            // 2. IT Dept
+            else if (username === 'it_dept' && password === 'it123') {
+                window.location.href = 'dashboard.html';
+            }
+            // 3. Electric Dept
+            else if (username === 'electric_dept' && password === 'electric123') {
+                window.location.href = 'dashboard.html';
+            }
+            // 4. Maintenance Dept
+            else if (username === 'maintenance_dept' && password === 'main123') {
+                window.location.href = 'dashboard.html';
+            }
+            // 5. Kitchen / Production Dept
+            else if (username === 'kitchen_dept' && password === 'kitchen123') {
+                window.location.href = 'dashboard.html';
+            }
+            else {
+                alert('Invalid Username or Password for Department!');
+            }
+        });
+    </script>
+</body>
+
+</html>
