@@ -4,31 +4,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akshay Patra - All Complaints</title>
-    <!-- Font Awesome Icons CDN -->
+    <title>Akshay Patra - Complaints Registry</title>
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        :root {
+            --primary-color: #064e35;
+            --primary-light: #0b6643;
+            --accent-color: #8dc63f;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --sidebar-width: 260px;
+            --border-color: #f1f5f9;
+            --search-border: #e2e8f0;
+            --modal-overlay-bg: rgba(15, 23, 42, 0.6);
+            --modal-desc-bg: #f8fafc;
+            --input-bg: #ffffff;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
             display: flex;
-            background-color: #f4f7f5;
             min-height: 100vh;
         }
 
-        /* --- SIDEBAR NAVIGATION --- */
+        /* --- SIDEBAR STYLING --- */
         .sidebar {
-            width: 260px;
-            background-color: #064e35;
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
             color: white;
             display: flex;
             flex-direction: column;
@@ -36,43 +52,46 @@
             height: 100vh;
             left: 0;
             top: 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
         }
 
         .sidebar-brand {
-            padding: 20px;
+            padding: 24px;
             text-align: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             background-color: #ffffff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .sidebar-logo {
             width: 100%;
-            max-width: 180px;
+            max-width: 160px;
             height: auto;
-            display: block;
-            margin: 0 auto;
         }
 
         .sidebar-menu {
             list-style: none;
-            padding: 20px 0;
+            padding: 24px 0;
             flex: 1;
         }
 
         .sidebar-menu li a {
             display: flex;
             align-items: center;
-            padding: 15px 25px;
-            color: #e0f0e8;
+            padding: 14px 24px;
+            color: #cbd5e1;
             text-decoration: none;
             font-size: 14px;
-            transition: 0.3s;
+            font-weight: 500;
+            margin: 4px 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
         .sidebar-menu li a i {
-            margin-right: 15px;
+            margin-right: 12px;
             font-size: 18px;
-            width: 25px;
+            width: 24px;
             text-align: center;
         }
 
@@ -80,179 +99,313 @@
         .sidebar-menu li a:hover {
             background-color: rgba(255, 255, 255, 0.1);
             color: #ffffff;
-            border-left: 4px solid #8dc63f;
+        }
+
+        .sidebar-menu li.active a {
+            background-color: var(--primary-light);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 24px;
         }
 
         .btn-logout {
             width: 100%;
-            background-color: #d9534f;
+            background-color: #ef4444;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
             text-decoration: none;
             font-size: 14px;
         }
 
-        /* --- MAIN CONTENT WINDOW --- */
+        /* --- MAIN CONTENT --- */
         .main-content {
-            margin-left: 260px;
+            margin-left: var(--sidebar-width);
             flex: 1;
             padding: 40px;
+            max-width: calc(100% - var(--sidebar-width));
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            color: #064e35;
-            font-size: 28px;
+        .page-title {
+            font-size: 26px;
+            color: var(--primary-color);
             font-weight: 700;
+            margin-bottom: 24px;
         }
 
-        /* --- FILTERS SECTION --- */
-        .filter-section {
-            background: white;
-            padding: 20px 25px;
+        /* --- FILTER BAR STYLING --- */
+        .filter-card {
+            background: var(--card-bg);
+            padding: 20px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
-            margin-bottom: 30px;
-            display: flex;
-            gap: 20px;
-            align-items: center;
-            flex-wrap: wrap;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
         }
 
         .filter-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
         }
 
         .filter-group label {
             font-size: 12px;
             font-weight: 600;
-            color: #555;
+            color: var(--text-muted);
+            text-transform: uppercase;
         }
 
-        .filter-group select,
-        .filter-group input {
-            padding: 8px 15px;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            font-size: 13px;
+        .filter-input,
+        .filter-select {
+            padding: 12px;
+            border: 1px solid var(--search-border);
+            border-radius: 8px;
+            font-size: 14px;
             outline: none;
-            color: #333;
-            min-width: 180px;
+            color: var(--text-main);
+            background: var(--card-bg);
+            width: 100%;
         }
 
-        .filter-group select:focus,
-        .filter-group input:focus {
-            border-color: #064e35;
+        .filter-input:focus,
+        .filter-select:focus {
+            border-color: var(--primary-color);
         }
 
-        /* --- DATA TABLE --- */
-        .table-section {
-            background: white;
-            padding: 30px;
+        /* --- TABLE PANEL --- */
+        .panel {
+            background: var(--card-bg);
+            padding: 24px;
             border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--border-color);
         }
 
-        table {
+        .custom-table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
         }
 
-        th,
-        td {
+        .custom-table th,
+        .custom-table td {
             padding: 14px 16px;
             font-size: 14px;
-            border-bottom: 1px solid #eee;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        th {
-            background-color: #f8faf9;
-            color: #555;
+        .custom-table th {
+            background-color: var(--bg-color);
+            color: var(--text-muted);
             font-weight: 600;
         }
 
-        tr:hover {
-            background-color: #fdfdfd;
-        }
-
-        .status-badge {
-            padding: 5px 12px;
-            border-radius: 20px;
+        .badge {
+            padding: 6px 12px;
+            border-radius: 30px;
             font-size: 12px;
             font-weight: 600;
-            text-transform: capitalize;
             display: inline-block;
         }
 
-        .status-pending {
-            background-color: #fff8e6;
-            color: #f0ad4e;
+        .badge-pending {
+            background-color: #fef3c7;
+            color: #d97706;
         }
 
-        .status-resolved {
-            background-color: #f1f9ec;
-            color: #5cb85c;
+        .badge-inprogress {
+            background-color: #e0f2fe;
+            color: #0369a1;
         }
 
-        .btn-action {
-            color: #064e35;
-            text-decoration: none;
+        .badge-resolved {
+            background-color: #dcfce7;
+            color: #16a34a;
+        }
+
+        .btn-view-action {
+            background: none;
+            border: none;
+            color: var(--primary-color);
             font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 4px;
         }
 
-        .btn-action:hover {
-            color: #8dc63f;
+        .btn-view-action:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
         }
 
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 70px;
-            }
+        /* --- MODAL POPUP STYLING --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--modal-overlay-bg);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
 
-            .sidebar-brand,
-            .sidebar-menu span,
-            .btn-logout span,
-            .sidebar-footer {
-                display: none;
-            }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-            .main-content {
-                margin-left: 70px;
-            }
+        .modal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
 
-            .sidebar-menu li a {
-                justify-content: center;
-                padding: 20px 0;
-            }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
 
-            .sidebar-menu li a i {
-                margin: 0;
-            }
+        .modal-header h3 {
+            font-size: 18px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .btn-close-modal {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .btn-close-modal:hover {
+            color: #ef4444;
+        }
+
+        .modal-body-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .modal-info-item label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .modal-info-item p {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .modal-desc-box {
+            background-color: var(--modal-desc-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 12px 16px;
+            border-radius: 4px 12px 12px 4px;
+            margin-bottom: 16px;
+        }
+
+        .modal-desc-box label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .admin-action-section {
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+
+        .admin-action-section h4 {
+            font-size: 14px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .admin-select,
+        .admin-textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--search-border);
+            font-size: 13.5px;
+            outline: none;
+        }
+
+        .admin-textarea {
+            resize: none;
+            height: 60px;
+        }
+
+        .btn-update-ticket {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-update-ticket:hover {
+            background-color: var(--primary-light);
         }
     </style>
 </head>
@@ -279,39 +432,39 @@
 
     <!-- MAIN CONTENT -->
     <div class="main-content">
-        <div class="header">
-            <h1>Complaints Registry</h1>
-        </div>
+        <h1 class="page-title">Complaints Registry</h1>
 
-        <!-- FILTERS -->
-        <div class="filter-section">
+        <!-- LIVE FILTERS CONTROL -->
+        <div class="filter-card">
             <div class="filter-group">
                 <label>Search</label>
-                <input type="text" placeholder="Search by ID or Subject...">
+                <input type="text" id="searchFilter" class="filter-input" placeholder="Search by ID or Subject...">
             </div>
             <div class="filter-group">
                 <label>Department</label>
-                <select>
+                <select id="deptFilter" class="filter-select">
                     <option value="all">All Departments</option>
-                    <option value="it">IT Department</option>
-                    <option value="electric">Electric Department</option>
-                    <option value="maintenance">Maintenance Department</option>
-                    <option value="kitchen">Kitchen / Production</option>
+                    <option value="Kitchen">Kitchen</option>
+                    <option value="IT">IT</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Mechanical">Mechanical</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label>Status</label>
-                <select>
+                <select id="statusFilter" class="filter-select">
                     <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="resolved">Resolved</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Resolved">Resolved</option>
                 </select>
             </div>
         </div>
 
-        <!-- COMPLAINTS TABLE -->
-        <div class="table-section">
-            <table>
+        <!-- RECENT REGISTRY PANEL -->
+        <div class="panel">
+            <table class="custom-table">
                 <thead>
                     <tr>
                         <th>Complaint ID</th>
@@ -322,48 +475,240 @@
                         <th>Action</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="complaintsTableBody">
                     <tr>
-                        <td>#CPM-9021</td>
-                        <td>Kitchen / Production</td>
-                        <td>Raw material delivery delay</td>
-                        <td>26 June 2026</td>
-                        <td><span class="status-badge status-pending">Pending</span></td>
-                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
-                                View</a></td>
-                    </tr>
-                    <tr>
-                        <td>#CPM-9019</td>
-                        <td>IT Department</td>
-                        <td>Main server internet down</td>
-                        <td>25 June 2026</td>
-                        <td><span class="status-badge status-resolved">Resolved</span></td>
-                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
-                                View</a></td>
-                    </tr>
-                    <tr>
-                        <td>#CPM-9018</td>
-                        <td>Electric Department</td>
-                        <td>Generator backup check needed</td>
-                        <td>24 June 2026</td>
-                        <td><span class="status-badge status-resolved">Resolved</span></td>
-                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
-                                View</a></td>
-                    </tr>
-                    <tr>
-                        <td>#CPM-9015</td>
-                        <td>Maintenance Department</td>
-                        <td>Cold storage room door alignment</td>
-                        <td>22 June 2026</td>
-                        <td><span class="status-badge status-pending">Pending</span></td>
-                        <td><a href="complaint-details.html" class="btn-action"><i class="fa-regular fa-eye"></i>
-                                View</a></td>
+                        <td colspan="6" style="text-align: center; color: #999; padding: 30px;">Loading live data
+                            stream...</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
+    <!-- VIEW & UPDATE DETAILS MODAL -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="modalComplaintId">Complaint #0000</h3>
+                <button class="btn-close-modal" id="btnCloseModal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body-grid">
+                <div class="modal-info-item"><label>Registered By</label>
+                    <p id="modalUser">Anonymous</p>
+                </div>
+                <div class="modal-info-item"><label>Department</label>
+                    <p id="modalDept">General</p>
+                </div>
+                <div class="modal-info-item"><label>Date Registered</label>
+                    <p id="modalDate">N/A</p>
+                </div>
+                <div class="modal-info-item"><label>Current Status</label>
+                    <p id="modalStatus">Pending</p>
+                </div>
+            </div>
+            <div class="modal-info-item" style="margin-bottom: 8px;">
+                <label>Subject</label>
+                <p id="modalSubject" style="font-weight: 600;"></p>
+            </div>
+            <div class="modal-desc-box">
+                <label>Detailed Problem Description</label>
+                <p id="modalDesc">No details provided.</p>
+            </div>
+
+            <!-- ADMINISTRATIVE ACTION PANEL -->
+            <div class="admin-action-section">
+                <h4><i class="fa-solid fa-user-gear"></i> Administrative Actions</h4>
+                <div class="form-group">
+                    <label>Change Ticket Status</label>
+                    <select class="admin-select" id="updateStatusSelect">
+                        <option value="Pending">Pending</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Resolution Remarks / Notes</label>
+                    <textarea class="admin-textarea" id="updateRemarksText"
+                        placeholder="Enter service action updates..."></textarea>
+                </div>
+                <button class="btn-update-ticket" id="btnUpdateTicket">
+                    <i class="fa-solid fa-floppy-disk"></i> Update Ticket Status
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE PIPELINE INTEGRATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrne4zTG5Z5wrpps3N6WTX__WJREJ_r1I",
+            authDomain: "akshayapatraassetmanagement.firebaseapp.com",
+            projectId: "akshayapatraassetmanagement",
+            storageBucket: "akshayapatraassetmanagement.firebasestorage.app",
+            messagingSenderId: "746715439733",
+            appId: "1:746715439733:web:e1567c9a04da24398b0e3c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const tableBody = document.getElementById("complaintsTableBody");
+        const searchFilter = document.getElementById("searchFilter");
+        const deptFilter = document.getElementById("deptFilter");
+        const statusFilter = document.getElementById("statusFilter");
+
+        // Modal Hooks
+        const detailsModal = document.getElementById("detailsModal");
+        const btnCloseModal = document.getElementById("btnCloseModal");
+        const modalComplaintId = document.getElementById("modalComplaintId");
+        const modalUser = document.getElementById("modalUser");
+        const modalDept = document.getElementById("modalDept");
+        const modalDate = document.getElementById("modalDate");
+        const modalStatus = document.getElementById("modalStatus");
+        const modalSubject = document.getElementById("modalSubject");
+        const modalDesc = document.getElementById("modalDesc");
+        const updateStatusSelect = document.getElementById("updateStatusSelect");
+        const updateRemarksText = document.getElementById("updateRemarksText");
+        const btnUpdateTicket = document.getElementById("btnUpdateTicket");
+
+        let allComplaints = [];
+        let activeSelectedDocId = null;
+
+        // Fetch Live Firestore Stream
+        const q = query(collection(db, "complaints"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+            allComplaints = [];
+            snapshot.forEach((doc) => {
+                allComplaints.push({ docId: doc.id, ...doc.data() });
+            });
+            applyFilters();
+        });
+
+        // Apply Real-time UI Filters
+        function applyFilters() {
+            const searchText = searchFilter.value.toLowerCase().trim();
+            const selectedDept = deptFilter.value;
+            const selectedStatus = statusFilter.value;
+
+            const filtered = allComplaints.filter(item => {
+                const matchesSearch = !searchText ||
+                    (item.complaintId && item.complaintId.toLowerCase().includes(searchText)) ||
+                    (item.title && item.title.toLowerCase().includes(searchText));
+
+                const matchesDept = selectedDept === "all" || (item.category && item.category.toLowerCase() === selectedDept.toLowerCase());
+                const matchesStatus = selectedStatus === "all" || (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+
+                return matchesSearch && matchesDept && matchesStatus;
+            });
+
+            renderTable(filtered);
+        }
+
+        // Render Table Rows
+        function renderTable(dataArray) {
+            let rowsHTML = "";
+            dataArray.forEach((item, index) => {
+                let badgeClass = "badge-pending";
+                if (item.status?.toLowerCase() === "resolved") badgeClass = "badge-resolved";
+                else if (item.status?.toLowerCase() === "in progress") badgeClass = "badge-inprogress";
+
+                let formattedDate = "N/A";
+                if (item.createdAt) {
+                    const d = new Date(item.createdAt);
+                    formattedDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+
+                rowsHTML += `
+                    <tr>
+                        <td><strong>#${item.complaintId || 'N/A'}</strong></td>
+                        <td>${item.category || 'N/A'}</td>
+                        <td>${item.title || 'N/A'}</td>
+                        <td>${formattedDate}</td>
+                        <td><span class="badge ${badgeClass}">${item.status || 'Pending'}</span></td>
+                        <td>
+                            <button class="btn-view-action" data-docid="${item.docId}">
+                                <i class="fa-regular fa-eye"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            if (rowsHTML === "") {
+                tableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #999; padding: 20px;">No matching records found.</td></tr>`;
+            } else {
+                tableBody.innerHTML = rowsHTML;
+                attachViewClickHandlers();
+            }
+        }
+
+        // Setup View Click to open Modal
+        function attachViewClickHandlers() {
+            const viewButtons = document.querySelectorAll(".btn-view-action");
+            viewButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const docId = btn.getAttribute("data-docid");
+                    const data = allComplaints.find(c => c.docId === docId);
+
+                    if (data) {
+                        activeSelectedDocId = data.docId;
+                        modalComplaintId.innerText = `Complaint #${data.complaintId || 'N/A'}`;
+                        modalUser.innerText = data.userName || data.name || "Anonymous";
+                        modalDept.innerText = data.category || "General";
+                        modalStatus.innerText = data.status || "Pending";
+                        modalSubject.innerText = data.title || "No Subject";
+                        modalDesc.innerText = data.description || "No description provided.";
+
+                        updateStatusSelect.value = data.status || "Pending";
+                        updateRemarksText.value = data.adminRemarks || "";
+
+                        if (data.createdAt) {
+                            const d = new Date(data.createdAt);
+                            modalDate.innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                        }
+
+                        detailsModal.classList.add("active");
+                    }
+                });
+            });
+        }
+
+        // Execute Firestore Update Writes
+        btnUpdateTicket.addEventListener("click", async () => {
+            if (!activeSelectedDocId) return;
+
+            btnUpdateTicket.disabled = true;
+            btnUpdateTicket.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
+
+            try {
+                const docRef = doc(db, "complaints", activeSelectedDocId);
+                await updateDoc(docRef, {
+                    status: updateStatusSelect.value,
+                    adminRemarks: updateRemarksText.value.trim()
+                });
+                detailsModal.classList.remove("active");
+                activeSelectedDocId = null;
+            } catch (error) {
+                console.error("Update failed:", error);
+                alert("Failed to update ticket.");
+            } finally {
+                btnUpdateTicket.disabled = false;
+                btnUpdateTicket.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update Ticket Status`;
+            }
+        });
+
+        // Event Listeners for Live Filters
+        searchFilter.addEventListener("input", applyFilters);
+        deptFilter.addEventListener("change", applyFilters);
+        statusFilter.addEventListener("change", applyFilters);
+
+        // Modal Close Setup
+        btnCloseModal.addEventListener("click", () => { detailsModal.classList.remove("active"); });
+        detailsModal.addEventListener("click", (e) => { if (e.target === detailsModal) detailsModal.classList.remove("active"); });
+    </script>
 </body>
 
 </html>
