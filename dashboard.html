@@ -1191,7 +1191,7 @@
         function updateLiveClock() {
             const now = new Date();
             const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
-            liveDateTimeEl.innerHTML = `<i class="fa-regular fa-calendar-days"></i> ${now.toLocaleDateString('en-GB', options)}`;
+            liveDateTimeEl.innerHTML = ⁠ <i class="fa-regular fa-calendar-days"></i> ${now.toLocaleDateString('en-GB', options)} ⁠;
         }
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
@@ -1218,7 +1218,7 @@
             resolvedCountEl.innerText = resolved;
 
             if (pending > 0) {
-                alertBoxEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation fa-beat"></i> <span><strong>Critical Alert:</strong> System has ${pending} unresolved pending issues right now! Please dispatch teams.</span>`;
+                alertBoxEl.innerHTML = ⁠ <i class="fa-solid fa-triangle-exclamation fa-beat"></i> <span><strong>Critical Alert:</strong> System has ${pending} unresolved pending issues right now! Please dispatch teams.</span> ⁠;
                 alertBoxEl.style.display = "flex";
             } else {
                 alertBoxEl.style.display = "none";
@@ -1279,10 +1279,10 @@
                     else if (item.status?.toLowerCase() === "in progress") badgeClass = "badge-inprogress";
 
                     let pPriority = item.priority || "Medium";
-                    let priorityClass = `priority-${pPriority.toLowerCase()}`;
+                    let priorityClass = ⁠ priority-${pPriority.toLowerCase()} ⁠;
                     let timerSpan = "";
                     if (pPriority.toLowerCase() === "high" && item.status?.toLowerCase() !== "resolved") {
-                        timerSpan = `<span class="sla-timer" id="timer-${item.docId}">Calculated...</span>`;
+                        timerSpan = ⁠ <span class="sla-timer" id="timer-${item.docId}">Calculated...</span> ⁠;
                     }
 
                     recentRowsHTML += `
@@ -1298,7 +1298,7 @@
             });
 
             if (recentRowsHTML === "") {
-                recentTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">No matching registry logs found.</td></tr>`;
+                recentTableBody.innerHTML = ⁠ <tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">No matching registry logs found.</td></tr> ⁠;
             } else {
                 recentTableBody.innerHTML = recentRowsHTML;
                 setupRowClickHandlers();
@@ -1312,7 +1312,7 @@
         }
 
         function startSLACountdown(docId, createdAtStr) {
-            const timerEl = document.getElementById(`timer-${docId}`);
+            const timerEl = document.getElementById(⁠ timer-${docId} ⁠);
             if (!timerEl) return;
 
             const createdTime = createdAtStr ? new Date(createdAtStr).getTime() : new Date().getTime();
@@ -1322,7 +1322,7 @@
                 const now = new Date().getTime();
                 const distance = slaLimit - now;
 
-                if (!document.getElementById(`timer-${docId}`)) { clearInterval(interval); return; }
+                if (!document.getElementById(⁠ timer-${docId} ⁠)) { clearInterval(interval); return; }
 
                 if (distance < 0) {
                     clearInterval(interval);
@@ -1332,7 +1332,7 @@
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-                    timerEl.innerText = `${hours}h ${minutes}m ${seconds}s left`;
+                    timerEl.innerText = ⁠ ${hours}h ${minutes}m ${seconds}s left ⁠;
                 }
             }, 1000);
             timerIntervals.push(interval);
@@ -1353,9 +1353,9 @@
                     let dotClass = "dot-pending"; let actionText = "";
                     const timeString = log.time ? new Date(log.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "N/A";
 
-                    if (log.status?.toLowerCase() === "resolved") { dotClass = "dot-resolved"; actionText = `Status changed to <strong>Resolved</strong> by Admin.`; }
-                    else if (log.status?.toLowerCase() === "in progress") { dotClass = "dot-inprogress"; actionText = `Status changed to <strong>In Progress</strong> by Admin.`; }
-                    else { dotClass = "dot-pending"; actionText = index === 0 ? `<strong>Complaint Created</strong> by User.` : `Status reset to <strong>Pending</strong> by Admin.`; }
+                    if (log.status?.toLowerCase() === "resolved") { dotClass = "dot-resolved"; actionText = ⁠ Status changed to <strong>Resolved</strong> by Admin. ⁠; }
+                    else if (log.status?.toLowerCase() === "in progress") { dotClass = "dot-inprogress"; actionText = ⁠ Status changed to <strong>In Progress</strong> by Admin. ⁠; }
+                    else { dotClass = "dot-pending"; actionText = index === 0 ? ⁠ <strong>Complaint Created</strong> by User. ⁠ : ⁠ Status reset to <strong>Pending</strong> by Admin. ⁠; }
 
                     html += `
                         <div class="timeline-item">
@@ -1377,7 +1377,7 @@
                     console.log("Complaint Data:", data);
                     console.log("Asset ID:", data.assetId);
 
-                    const response = await fetch(`http://localhost:3000/api/assets/${data.assetId}`);
+                    const response = await fetch(⁠ http://localhost:3000/api/assets/${data.assetId} ⁠);
 
                     if (!response.ok) {
                         throw new Error("Failed to fetch asset details.");
@@ -1397,7 +1397,7 @@
 
                     if (data) {
                         activeSelectedDocId = data.docId;
-                        modalComplaintId.innerText = `Complaint #${data.complaintId || 'N/A'}`;
+                        modalComplaintId.innerText = ⁠ Complaint #${data.complaintId || 'N/A'} ⁠;
                         modalUser.innerText = data.userName || data.name || "Anonymous";
                         modalDept.innerText = data.category || "General";
                         modalSubject.innerText = data.title || "No Subject";
@@ -1412,7 +1412,7 @@
                         // Load latest asset details from Snipe-IT
                         if (data.assetId) {
                             try {
-                                const response = await fetch(`http://localhost:3000/api/assets/${data.assetId}`);
+                                const response = await fetch(⁠ http://localhost:3000/api/assets/${data.assetId} ⁠);
 
                                 if (response.ok) {
                                     const asset = await response.json();
@@ -1524,14 +1524,14 @@
 
         btnExportPDF.addEventListener("click", () => {
             if (cachedComplaints.length === 0) { alert("No data to export."); return; }
-            document.getElementById("pdfGeneratedTimestamp").innerText = `Export Date: ${new Date().toLocaleString('en-GB')}`;
+            document.getElementById("pdfGeneratedTimestamp").innerText = ⁠ Export Date: ${new Date().toLocaleString('en-GB')} ⁠;
 
             const targetSection = document.getElementById("hiddenPdfPrintSection");
             targetSection.style.display = "block";
 
             const pdfOptions = {
                 margin: [12, 12, 12, 12],
-                filename: `Akshaya_Patra_MasterReport.pdf`,
+                filename: ⁠ Akshaya_Patra_MasterReport.pdf ⁠,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, logging: false },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
@@ -1557,14 +1557,14 @@
                 let priority = item.priority || "Medium";
                 let status = item.status || "Pending";
                 let dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : 'N/A';
-                csvRows.push(`"${id}","${name}","${dept}","${subject}","${priority}","${status}","${dateStr}"`);
+                csvRows.push(⁠ "${id}","${name}","${dept}","${subject}","${priority}","${status}","${dateStr}" ⁠);
             });
 
             const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Akshaya_Patra_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.setAttribute("download", ⁠ Akshaya_Patra_Report_${new Date().toISOString().slice(0, 10)}.csv ⁠);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -1580,7 +1580,7 @@
             }
 
             btnUpdateTicket.disabled = true;
-            btnUpdateTicket.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
+            btnUpdateTicket.innerHTML = ⁠ <i class="fa-solid fa-spinner fa-spin"></i> Updating... ⁠;
             const currentTimestamp = new Date().toISOString();
             const newHistoryLog = { status: currentSelectedStatus, time: currentTimestamp };
 
@@ -1601,7 +1601,7 @@
                 alert("Failed to update status.");
             } finally {
                 btnUpdateTicket.disabled = false;
-                btnUpdateTicket.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update Status`;
+                btnUpdateTicket.innerHTML = ⁠ <i class="fa-solid fa-floppy-disk"></i> Update Status ⁠;
             }
         });
     </script>
