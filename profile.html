@@ -25,7 +25,6 @@
             min-height: 100vh;
         }
 
-        /* --- SIDEBAR NAVIGATION --- */
         .sidebar {
             width: 260px;
             background-color: #064e35;
@@ -36,6 +35,7 @@
             height: 100vh;
             left: 0;
             top: 0;
+            z-index: 100;
         }
 
         .sidebar-brand {
@@ -43,14 +43,20 @@
             text-align: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             background-color: #ffffff;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .sidebar-logo {
             width: 100%;
             max-width: 180px;
             height: auto;
+            max-height: 70px;
             display: block;
             margin: 0 auto;
+            object-fit: contain;
         }
 
         .sidebar-menu {
@@ -283,6 +289,7 @@
             <li><a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
             <li><a href="complaints.html"><i class="fa-regular fa-clipboard"></i> <span>Complaints</span></a></li>
             <li class="active"><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="analysis.html"><i class="fa-solid fa-chart-line"></i> <span>Analysis</span></a></li>
             <!-- <li><a href="analytics.html"><i class="fa-solid fa-chart-line"></i> <span>Analytics</span></a></li> -->
         </ul>
         <div class="sidebar-footer">

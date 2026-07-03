@@ -83,9 +83,9 @@
             text-decoration: none;
             font-size: 14px;
             font-weight: 500;
+            transition: all 0.3s ease;
             margin: 4px 16px;
             border-radius: 8px;
-            transition: all 0.3s ease;
         }
 
         .sidebar-menu li a i {
@@ -280,7 +280,7 @@
         .modal-card {
             background: var(--card-bg);
             width: 100%;
-            max-width: 600px;
+            max-width: 650px;
             border-radius: 16px;
             padding: 28px;
             border: 1px solid var(--border-color);
@@ -422,6 +422,7 @@
             <li class="active"><a href="complaints.html"><i class="fa-regular fa-clipboard"></i>
                     <span>Complaints</span></a></li>
             <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="analysis.html"><i class="fa-solid fa-chart-line"></i> <span>Analysis</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <a href="index.html" class="btn-logout">
@@ -454,7 +455,7 @@
             <div class="filter-group">
                 <label>Status</label>
                 <select id="statusFilter" class="filter-select">
-                    <option value="all">All Status</option>
+                    <option value="all">All Active Status</option>
                     <option value="Pending">Pending</option>
                     <option value="In Progress">In Progress</option>
                     <option value="Resolved">Resolved</option>
@@ -496,13 +497,16 @@
                 <div class="modal-info-item"><label>Registered By</label>
                     <p id="modalUser">Anonymous</p>
                 </div>
+                <div class="modal-info-item"><label>User Email</label>
+                    <p id="modalEmail">Not Available</p>
+                </div>
                 <div class="modal-info-item"><label>Department</label>
                     <p id="modalDept">General</p>
                 </div>
                 <div class="modal-info-item"><label>Date Registered</label>
                     <p id="modalDate">N/A</p>
                 </div>
-                <div class="modal-info-item"><label>Current Status</label>
+                <div class="modal-info-item" style="grid-column: span 2;"><label>Current Status</label>
                     <p id="modalStatus">Pending</p>
                 </div>
             </div>
@@ -541,7 +545,7 @@
     <!-- FIREBASE PIPELINE INTEGRATION -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCrne4zTG5Z5wrpps3N6WTX__WJREJ_r1I",
@@ -565,6 +569,7 @@
         const btnCloseModal = document.getElementById("btnCloseModal");
         const modalComplaintId = document.getElementById("modalComplaintId");
         const modalUser = document.getElementById("modalUser");
+        const modalEmail = document.getElementById("modalEmail");
         const modalDept = document.getElementById("modalDept");
         const modalDate = document.getElementById("modalDate");
         const modalStatus = document.getElementById("modalStatus");
@@ -594,12 +599,23 @@
             const selectedStatus = statusFilter.value;
 
             const filtered = allComplaints.filter(item => {
-                const matchesSearch = !searchText ||
-                    (item.complaintId && item.complaintId.toLowerCase().includes(searchText)) ||
-                    (item.title && item.title.toLowerCase().includes(searchText));
+                // Check both field mappings ('complaintId'/'id' and 'title'/'subject')
+                const compId = item.complaintId || item.id || "";
+                const compTitle = item.title || item.subject || "";
+                const compDept = item.category || item.department || "";
 
-                const matchesDept = selectedDept === "all" || (item.category && item.category.toLowerCase() === selectedDept.toLowerCase());
-                const matchesStatus = selectedStatus === "all" || (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+                const matchesSearch = !searchText ||
+                    compId.toLowerCase().includes(searchText) ||
+                    compTitle.toLowerCase().includes(searchText);
+
+                const matchesDept = selectedDept === "all" || compDept.toLowerCase() === selectedDept.toLowerCase();
+
+                let matchesStatus = false;
+                if (selectedStatus === "all") {
+                    matchesStatus = (item.status && item.status.toLowerCase() !== "resolved");
+                } else {
+                    matchesStatus = (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+                }
 
                 return matchesSearch && matchesDept && matchesStatus;
             });
@@ -615,17 +631,17 @@
                 if (item.status?.toLowerCase() === "resolved") badgeClass = "badge-resolved";
                 else if (item.status?.toLowerCase() === "in progress") badgeClass = "badge-inprogress";
 
-                let formattedDate = "N/A";
-                if (item.createdAt) {
+                let formattedDate = item.dateRegistered || "N/A";
+                if (item.createdAt && formattedDate === "N/A") {
                     const d = new Date(item.createdAt);
                     formattedDate = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
                 }
 
                 rowsHTML += `
                     <tr>
-                        <td><strong>#${item.complaintId || 'N/A'}</strong></td>
-                        <td>${item.category || 'N/A'}</td>
-                        <td>${item.title || 'N/A'}</td>
+                        <td><strong>#${item.complaintId || item.id || 'N/A'}</strong></td>
+                        <td>${item.category || item.department || 'N/A'}</td>
+                        <td>${item.title || item.subject || 'N/A'}</td>
                         <td>${formattedDate}</td>
                         <td><span class="badge ${badgeClass}">${item.status || 'Pending'}</span></td>
                         <td>
@@ -645,7 +661,7 @@
             }
         }
 
-        // Setup View Click to open Modal
+        // Setup View Click to open Modal with all Details (Mapped fields from details page)
         function attachViewClickHandlers() {
             const viewButtons = document.querySelectorAll(".btn-view-action");
             viewButtons.forEach(btn => {
@@ -655,17 +671,19 @@
 
                     if (data) {
                         activeSelectedDocId = data.docId;
-                        modalComplaintId.innerText = `Complaint #${data.complaintId || 'N/A'}`;
-                        modalUser.innerText = data.userName || data.name || "Anonymous";
-                        modalDept.innerText = data.category || "General";
+                        modalComplaintId.innerText = `Complaint #${data.complaintId || data.id || 'N/A'}`;
+                        modalUser.innerText = data.registeredBy || data.userName || data.name || "Anonymous";
+                        modalEmail.innerText = data.userEmail || "Not Available";
+                        modalDept.innerText = data.department || data.category || "General";
                         modalStatus.innerText = data.status || "Pending";
-                        modalSubject.innerText = data.title || "No Subject";
+                        modalSubject.innerText = data.subject || data.title || "No Subject";
                         modalDesc.innerText = data.description || "No description provided.";
 
                         updateStatusSelect.value = data.status || "Pending";
-                        updateRemarksText.value = data.adminRemarks || "";
+                        updateRemarksText.value = data.remarks || data.adminRemarks || "";
 
-                        if (data.createdAt) {
+                        modalDate.innerText = data.dateRegistered || "N/A";
+                        if (data.createdAt && modalDate.innerText === "N/A") {
                             const d = new Date(data.createdAt);
                             modalDate.innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         }
@@ -676,7 +694,7 @@
             });
         }
 
-        // Execute Firestore Update Writes
+        // Execute Firestore Update Writes (With History Array Support)
         btnUpdateTicket.addEventListener("click", async () => {
             if (!activeSelectedDocId) return;
 
@@ -684,10 +702,19 @@
             btnUpdateTicket.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
 
             try {
+                const newStatus = updateStatusSelect.value;
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " (" + now.toLocaleDateString() + ")";
+
                 const docRef = doc(db, "complaints", activeSelectedDocId);
                 await updateDoc(docRef, {
-                    status: updateStatusSelect.value,
-                    adminRemarks: updateRemarksText.value.trim()
+                    status: newStatus,
+                    remarks: updateRemarksText.value.trim(),
+                    adminRemarks: updateRemarksText.value.trim(), // Supports both naming variants
+                    history: arrayUnion({
+                        status: newStatus,
+                        time: timeString
+                    })
                 });
                 detailsModal.classList.remove("active");
                 activeSelectedDocId = null;

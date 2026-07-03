@@ -330,10 +330,16 @@
             <img src="image.png" alt="Akshaya Patra Logo" class="sidebar-logo">
         </div>
         <ul class="sidebar-menu">
-            <li><a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
-            <li class="active"><a href="dashboard.html#complaintsSection"><i class="fa-regular fa-clipboard"></i>
-                    <span>Complaints</span></a></li>
-            <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+            <li>
+                <a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a>
+            </li>
+            <!-- અહીં લિંક dashboard.html થી બદલીને complaints.html કરી દીધી છે જેથી સીધું લિસ્ટ ખુલે -->
+            <li class="active">
+                <a href="complaints.html"><i class="fa-regular fa-clipboard"></i> <span>Complaints</span></a>
+            </li>
+            <li>
+                <a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a>
+            </li>
         </ul>
         <div class="sidebar-footer">
             <a href="index.html" class="btn-logout">
@@ -449,15 +455,24 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    // ડેટા મેપિંગ (dashboard.html ના ફિલ્ડ્સના નામ મુજબ અપડેટ કર્યા છે)
+                    // ડેટા મેપિંગ
                     txtId.innerText = `Complaint ID: #${data.complaintId || complaintDocId.substring(0, 5)}`;
-                    txtSubject.innerText = data.subject || "No Subject Provided";
-                    txtDept.innerText = data.department || "General";
-                    txtUser.innerText = data.registeredBy || "Anonymous";
+                    txtSubject.innerText = data.subject || data.title || "No Subject Provided";
+                    txtDept.innerText = data.department || data.category || "General";
+                    txtUser.innerText = data.registeredBy || data.userName || "Anonymous";
                     txtEmail.innerText = data.userEmail || "Not Available";
                     txtDesc.innerText = data.description || "No detailed description written.";
-                    adminRemarks.value = data.remarks || "";
-                    txtDate.innerText = data.dateRegistered || "N/A";
+                    adminRemarks.value = data.remarks || data.adminRemarks || "";
+
+                    // તારીખ સેટિંગ
+                    if (data.dateRegistered) {
+                        txtDate.innerText = data.dateRegistered;
+                    } else if (data.createdAt) {
+                        const d = new Date(data.createdAt);
+                        txtDate.innerText = d.toLocaleDateString();
+                    } else {
+                        txtDate.innerText = "N/A";
+                    }
 
                     // સ્ટેટસ બેજ અને ડ્રોપડાઉન મેનેજમેન્ટ
                     const currentStatus = data.status || "Pending";
@@ -493,6 +508,7 @@
                 await updateDoc(docRef, {
                     status: newStatus,
                     remarks: adminRemarks.value,
+                    adminRemarks: adminRemarks.value, // બંને નામ સપોર્ટ કરવા માટે
                     history: arrayUnion({
                         status: newStatus,
                         time: timeString

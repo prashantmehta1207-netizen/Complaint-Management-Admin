@@ -5,12 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Akshay Patra - Ultimate Enterprise Dashboard</title>
-    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chart.js CDN for Dynamic Analytics Graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         /* --- GLOBAL ROOT THEME VARIABLES --- */
@@ -165,6 +163,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            position: relative;
         }
 
         .btn-quick {
@@ -199,6 +198,51 @@
 
         .btn-quick-secondary:hover {
             background-color: var(--border-color);
+        }
+
+        /* DROPDOWN ACTIONS STYLING */
+        .dropdown-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .export-dropdown {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--search-border);
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 500;
+            min-width: 160px;
+            overflow: hidden;
+        }
+
+        .export-dropdown.show {
+            display: block;
+        }
+
+        .export-dropdown button {
+            width: 100%;
+            padding: 12px 16px;
+            background: none;
+            border: none;
+            text-align: left;
+            font-size: 13.5px;
+            font-weight: 500;
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-dropdown button:hover {
+            background-color: var(--border-color);
+            color: var(--primary-color);
         }
 
         /* --- VOICE ASSISTANT BUTTON --- */
@@ -765,6 +809,62 @@
             background-color: var(--primary-light);
         }
 
+        /* HIDDEN MASTER PDF VIEW REGISTRY STYLING */
+        #hiddenPdfPrintSection {
+            display: none;
+            background-color: #ffffff !important;
+            color: #1e293b !important;
+            padding: 30px;
+        }
+
+        .pdf-report-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 3px solid #064e35;
+            padding-bottom: 15px;
+        }
+
+        .pdf-report-header h1 {
+            color: #064e35 !important;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .pdf-report-header h2 {
+            color: #475569 !important;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .pdf-report-header p {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .pdf-table th {
+            background-color: #064e35 !important;
+            color: #ffffff !important;
+            padding: 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .pdf-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 12px;
+            color: #1e293b !important;
+        }
+
         /* --- RESPONSIVE ADAPTATIONS --- */
         @media (max-width: 1024px) {
             .dashboard-grid {
@@ -805,7 +905,6 @@
 
 <body>
 
-    <!-- SIDEBAR NAVIGATION AREA -->
     <div class="sidebar">
         <div class="sidebar-brand">
             <img src="image.png" alt="Akshaya Patra Logo" class="sidebar-logo">
@@ -815,6 +914,7 @@
             </li>
             <li><a href="complaints.html"><i class="fa-regular fa-clipboard"></i> <span>Complaints</span></a></li>
             <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+            <li><a href="analysis.html"><i class="fa-solid fa-chart-line"></i> <span>Analysis</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <a href="index.html" class="btn-logout">
@@ -823,77 +923,73 @@
         </div>
     </div>
 
-    <!-- MAIN DASHBOARD PANEL CONTENT AREA -->
     <div class="main-content">
 
-        <!-- TOP MODULE HEADER & SYSTEM QUICK ACTIONS -->
         <div class="top-header">
             <div class="welcome-text">
                 <h1>Welcome Back, Admin</h1>
                 <p id="liveDateTime"><i class="fa-regular fa-calendar-days"></i> Loading real-time clock stream...</p>
             </div>
             <div class="quick-actions">
-                <!-- VOICE COMMAND BUTTON -->
                 <button class="btn-voice" id="btnVoiceCommand" title="Voice Search (Say Department name or Status)">
                     <i class="fa-solid fa-microphone"></i>
                 </button>
                 <a href="complaints.html" class="btn-quick btn-quick-primary">
                     <i class="fa-solid fa-plus"></i> Register Complaint
                 </a>
-                <button class="btn-quick btn-quick-secondary" id="btnExport">
-                    <i class="fa-solid fa-file-export"></i> Export Report
-                </button>
+
+                <div class="dropdown-wrapper">
+                    <button class="btn-quick btn-quick-secondary" id="btnExport">
+                        <i class="fa-solid fa-file-export"></i> Export Report <i class="fa-solid fa-chevron-down"
+                            style="font-size: 10px; margin-left: 4px;"></i>
+                    </button>
+                    <div class="export-dropdown" id="exportDropdownMenu">
+                        <button id="btnExportPDF"><i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> Export as
+                            PDF</button>
+                        <button id="btnExportExcel"><i class="fa-solid fa-file-excel" style="color: #10b981;"></i>
+                            Export as Excel</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- LIVE DYNAMIC CRITICAL ALERTS BANNER -->
         <div class="alert-box" id="criticalAlert" style="display: none;">
             <i class="fa-solid fa-triangle-exclamation fa-beat"></i>
             <span><strong>System Notice:</strong> Monitor live complaints registry below. Check unresolved tickets
                 immediately.</span>
         </div>
 
-        <!-- ANALYTICAL REAL-TIME DATA STATS CARDS -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-details">
                     <h3>Total</h3>
                     <p id="totalCount">0</p>
                 </div>
-                <div class="stat-icon icon-blue">
-                    <i class="fa-solid fa-folder-open"></i>
-                </div>
+                <div class="stat-icon icon-blue"><i class="fa-solid fa-folder-open"></i></div>
             </div>
             <div class="stat-card">
                 <div class="stat-details">
                     <h3>Pending</h3>
                     <p id="pendingCount">0</p>
                 </div>
-                <div class="stat-icon icon-orange">
-                    <i class="fa-solid fa-clock-rotate-left"></i>
-                </div>
+                <div class="stat-icon icon-orange"><i class="fa-solid fa-clock-rotate-left"></i></div>
             </div>
             <div class="stat-card">
                 <div class="stat-details">
                     <h3>In Progress</h3>
                     <p id="inprogressCount">0</p>
                 </div>
-                <div class="stat-icon icon-indigo">
-                    <i class="fa-solid fa-spinner"></i>
-                </div>
+                <div class="stat-icon icon-indigo"><i class="fa-solid fa-spinner"></i></div>
             </div>
             <div class="stat-card">
                 <div class="stat-details">
                     <h3>Resolved</h3>
                     <p id="resolvedCount">0</p>
                 </div>
-                <div class="stat-icon icon-green">
-                    <i class="fa-solid fa-circle-check"></i>
-                </div>
+                <div class="stat-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
             </div>
         </div>
 
-        <!-- ADVANCED FILTERS ROW -->
         <div class="filter-row">
             <div class="search-container">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -920,10 +1016,7 @@
             </div>
         </div>
 
-        <!-- MAIN RESPONSIVE DATABASE VIEW GRID -->
         <div class="dashboard-grid">
-
-            <!-- RECENT REALTIME COMPLAINTS DATA TABLE RECORD VIEW -->
             <div class="panel">
                 <div class="panel-header">
                     <h2>Recent Live Registry</h2>
@@ -947,7 +1040,6 @@
                 </table>
             </div>
 
-            <!-- DYNAMIC DEPARTMENT METRICS CHART VISUALIZER -->
             <div class="panel">
                 <div class="panel-header">
                     <h2>Department Wise</h2>
@@ -956,11 +1048,31 @@
                     <canvas id="analyticsChart"></canvas>
                 </div>
             </div>
-
         </div>
     </div>
 
-    <!-- DYNAMIC VIEW DETAILS MODAL POPUP HTML -->
+    <div id="hiddenPdfPrintSection">
+        <div class="pdf-report-header">
+            <h1>THE AKSHAYA PATRA FOUNDATION</h1>
+            <h2>Asset Complaints Live Master Report</h2>
+            <p id="pdfGeneratedTimestamp"></p>
+        </div>
+        <table class="pdf-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>User Name</th>
+                    <th>Department</th>
+                    <th>Subject Title</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created Date</th>
+                </tr>
+            </thead>
+            <tbody id="pdfMasterTableBody"></tbody>
+        </table>
+    </div>
+
     <div class="modal-overlay" id="detailsModal">
         <div class="modal-card">
             <div class="modal-header">
@@ -968,21 +1080,17 @@
                 <button class="btn-close-modal" id="btnCloseModal"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="modal-body-grid">
-                <div class="modal-info-item">
-                    <label>Registered By</label>
+                <div class="modal-info-item"><label>Registered By</label>
                     <p id="modalUser">Anonymous</p>
                 </div>
-                <div class="modal-info-item">
-                    <label>Department</label>
+                <div class="modal-info-item"><label>Department</label>
                     <p id="modalDept">General</p>
                 </div>
-                <div class="modal-info-item">
-                    <label>Date Registered</label>
+                <div class="modal-info-item"><label>Date Registered</label>
                     <p id="modalDate">N/A</p>
                 </div>
             </div>
-            <div class="modal-info-item" style="margin-bottom: 8px;">
-                <label>Subject</label>
+            <div class="modal-info-item" style="margin-bottom: 8px;"><label>Subject</label>
                 <p id="modalSubject" style="font-weight: 600; font-size: 14.5px;"></p>
             </div>
 
@@ -1001,18 +1109,13 @@
                 <p id="modalDesc">No details provided.</p>
             </div>
 
-            <!-- NEW TIMELINE TRACKER SECTION -->
             <div class="timeline-section">
                 <h4><i class="fa-solid fa-timeline"></i> Complaint History Log</h4>
-                <div class="timeline-wrapper" id="modalTimeline">
-                    <!-- Dynamic Log Items will appear here -->
-                </div>
+                <div class="timeline-wrapper" id="modalTimeline"></div>
             </div>
 
-            <!-- LIVE OPERATION ACTION SECTION PANEL FOR ADMIN WRITE HANDLERS -->
             <div class="admin-action-section">
                 <h4><i class="fa-solid fa-user-gear"></i> Administrative Actions</h4>
-
                 <div class="form-group">
                     <label>Change Ticket Status</label>
                     <select class="admin-select" id="updateStatusSelect">
@@ -1021,20 +1124,16 @@
                         <option value="Resolved">Resolved</option>
                     </select>
                 </div>
-
-                <button class="btn-update-ticket" id="btnUpdateTicket">
-                    <i class="fa-solid fa-floppy-disk"></i> Update Status
-                </button>
+                <button class="btn-update-ticket" id="btnUpdateTicket"><i class="fa-solid fa-floppy-disk"></i> Update
+                    Status</button>
             </div>
         </div>
     </div>
 
-    <!-- CORE INTEGRATION LOGIC WITH FIREBASE & CHART UTILITIES -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, query, orderBy, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyCrne4zTG5Z5wrpps3N6WTX__WJREJ_r1I",
             authDomain: "akshayapatraassetmanagement.firebaseapp.com",
@@ -1052,18 +1151,20 @@
         const inprogressCountEl = document.getElementById("inprogressCount");
         const resolvedCountEl = document.getElementById("resolvedCount");
         const recentTableBody = document.getElementById("recentTableBody");
+        const pdfMasterTableBody = document.getElementById("pdfMasterTableBody");
         const liveDateTimeEl = document.getElementById("liveDateTime");
 
-        // Filter Inputs
         const searchInput = document.getElementById("dashboardSearch");
         const filterDeptSelect = document.getElementById("filterDeptSelect");
         const filterStatusSelect = document.getElementById("filterStatusSelect");
 
         const alertBoxEl = document.getElementById("criticalAlert");
         const btnExport = document.getElementById("btnExport");
+        const exportDropdownMenu = document.getElementById("exportDropdownMenu");
+        const btnExportPDF = document.getElementById("btnExportPDF");
+        const btnExportExcel = document.getElementById("btnExportExcel");
         const btnVoiceCommand = document.getElementById("btnVoiceCommand");
 
-        // Modal Elements Reference Hooks
         const detailsModal = document.getElementById("detailsModal");
         const btnCloseModal = document.getElementById("btnCloseModal");
         const modalComplaintId = document.getElementById("modalComplaintId");
@@ -1079,7 +1180,6 @@
         const modalDesc = document.getElementById("modalDesc");
         const modalTimeline = document.getElementById("modalTimeline");
 
-        // Admin Actions Form Controllers Hooks
         const updateStatusSelect = document.getElementById("updateStatusSelect");
         const btnUpdateTicket = document.getElementById("btnUpdateTicket");
 
@@ -1088,7 +1188,6 @@
         let activeSelectedDocId = null;
         let timerIntervals = [];
 
-        // 1. LIVE TIME SYSTEM CONTROLLER UTILITY
         function updateLiveClock() {
             const now = new Date();
             const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -1097,28 +1196,20 @@
         setInterval(updateLiveClock, 1000);
         updateLiveClock();
 
-        // 2. LIVE FIREBASE REAL-TIME SYNC DATASTREAM PIPELINE
         const qAll = query(collection(db, "complaints"), orderBy("createdAt", "desc"));
 
         onSnapshot(qAll, (snapshot) => {
             cachedComplaints = [];
-            let total = 0;
-            let pending = 0;
-            let inprogress = 0;
-            let resolved = 0;
+            let total = 0; let pending = 0; let inprogress = 0; let resolved = 0;
 
             snapshot.forEach((doc) => {
                 const data = doc.data();
                 cachedComplaints.push({ docId: doc.id, ...data });
                 total++;
 
-                if (data.status?.toLowerCase() === "resolved") {
-                    resolved++;
-                } else if (data.status?.toLowerCase() === "in progress") {
-                    inprogress++;
-                } else {
-                    pending++;
-                }
+                if (data.status?.toLowerCase() === "resolved") { resolved++; }
+                else if (data.status?.toLowerCase() === "in progress") { inprogress++; }
+                else { pending++; }
             });
 
             totalCountEl.innerText = total;
@@ -1134,26 +1225,24 @@
             }
 
             applyAdvancedFilters();
-            const deptCounts = calculateDeptCounts(cachedComplaints);
-            updateDashboardChart(deptCounts);
-
-            // If modal is open, refresh its data live
-            if (activeSelectedDocId && detailsModal.classList.contains("active")) {
-                const currentData = cachedComplaints.find(item => item.docId === activeSelectedDocId);
-                if (currentData) renderTimeline(currentData);
-            }
         });
 
+        // 🟢 સુધારેલું કાઉન્ટ ફંક્શન: જે Kitchen અને Kitchen/Production બંનેને ગણતરીમાં લેશે
         function calculateDeptCounts(dataArray) {
             const counts = { "kitchen": 0, "it": 0, "electrical": 0, "maintenance": 0, "mechanical": 0 };
             dataArray.forEach(item => {
-                const deptKey = item.category ? item.category.toLowerCase().trim().replace(/[\s\/]/g, '') : "";
-                if (counts[deptKey] !== undefined) { counts[deptKey]++; }
+                let deptStr = item.category ? item.category.toLowerCase().trim() : "";
+
+                if (deptStr.includes("kitchen")) {
+                    counts["kitchen"]++;
+                } else {
+                    const deptKey = deptStr.replace(/[\s\/]/g, '');
+                    if (counts[deptKey] !== undefined) { counts[deptKey]++; }
+                }
             });
             return counts;
         }
 
-        // 3. CHART.JS VISUALIZER UPDATE
         function updateDashboardChart(counts) {
             const ctx = document.getElementById('analyticsChart').getContext('2d');
             const dataValues = [counts.kitchen, counts.it, counts.electrical, counts.maintenance, counts.mechanical];
@@ -1166,28 +1255,20 @@
                     type: 'doughnut',
                     data: {
                         labels: ['Kitchen', 'IT', 'Electrical', 'Maintenance', 'Mechanical'],
-                        datasets: [{
-                            data: dataValues,
-                            backgroundColor: ['#f97316', '#3b82f6', '#eab308', '#a855f7', '#064e35'],
-                            borderWidth: 2
-                        }]
+                        datasets: [{ data: dataValues, backgroundColor: ['#f97316', '#3b82f6', '#eab308', '#a855f7', '#064e35'], borderWidth: 2 }]
                     },
                     options: {
                         responsive: true,
-                        plugins: {
-                            legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } }
-                        },
+                        plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } } },
                         cutout: '70%'
                     }
                 });
             }
         }
 
-        // 4. RENDERING LAYOUT ENGINE FOR DATA TABLES MATRIX
         function renderDashboardTable(dataArray) {
             timerIntervals.forEach(clearInterval);
             timerIntervals = [];
-
             let recentRowsHTML = "";
             let count = 0;
 
@@ -1199,7 +1280,6 @@
 
                     let pPriority = item.priority || "Medium";
                     let priorityClass = `priority-${pPriority.toLowerCase()}`;
-
                     let timerSpan = "";
                     if (pPriority.toLowerCase() === "high" && item.status?.toLowerCase() !== "resolved") {
                         timerSpan = `<span class="sla-timer" id="timer-${item.docId}">Calculated...</span>`;
@@ -1209,11 +1289,7 @@
                         <tr class="clickable-row" data-id="${item.docId}">
                             <td><strong>#${item.complaintId || 'N/A'}</strong></td>
                             <td>${item.category || 'N/A'}</td>
-                            <td>
-                                ${item.title || 'N/A'} 
-                                <span class="tag-priority ${priorityClass}">${pPriority}</span>
-                                ${timerSpan}
-                            </td>
+                            <td>${item.title || 'N/A'} <span class="tag-priority ${priorityClass}">${pPriority}</span> ${timerSpan}</td>
                             <td><span class="badge ${badgeClass}">${item.status || 'Pending'}</span></td>
                         </tr>
                     `;
@@ -1226,7 +1302,6 @@
             } else {
                 recentTableBody.innerHTML = recentRowsHTML;
                 setupRowClickHandlers();
-
                 dataArray.forEach((item) => {
                     let pPriority = item.priority || "Medium";
                     if (pPriority.toLowerCase() === "high" && item.status?.toLowerCase() !== "resolved") {
@@ -1247,10 +1322,7 @@
                 const now = new Date().getTime();
                 const distance = slaLimit - now;
 
-                if (!document.getElementById(`timer-${docId}`)) {
-                    clearInterval(interval);
-                    return;
-                }
+                if (!document.getElementById(`timer-${docId}`)) { clearInterval(interval); return; }
 
                 if (distance < 0) {
                     clearInterval(interval);
@@ -1263,52 +1335,33 @@
                     timerEl.innerText = `${hours}h ${minutes}m ${seconds}s left`;
                 }
             }, 1000);
-
             timerIntervals.push(interval);
         }
 
-        // --- RENDERING DYNAMIC HISTORY TIMELINE ---
         function renderTimeline(data) {
             modalTimeline.innerHTML = "";
             let html = "";
-
-            // Fallback: If no history array exists, build default user creation item
             if (!data.history || data.history.length === 0) {
                 const formattedTime = data.createdAt ? new Date(data.createdAt).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "N/A";
                 html = `
                     <div class="timeline-item">
                         <div class="timeline-dot dot-pending"></div>
-                        <div class="timeline-content">
-                            <strong>Complaint Created</strong> by User. <span class="timeline-time">${formattedTime}</span>
-                        </div>
-                    </div>
-                `;
+                        <div class="timeline-content"><strong>Complaint Created</strong> by User. <span class="timeline-time">${formattedTime}</span></div>
+                    </div>`;
             } else {
-                // Loop through array logs registered in database
                 data.history.forEach((log, index) => {
-                    let dotClass = "dot-pending";
-                    let actionText = "";
+                    let dotClass = "dot-pending"; let actionText = "";
                     const timeString = log.time ? new Date(log.time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }) : "N/A";
 
-                    if (log.status?.toLowerCase() === "resolved") {
-                        dotClass = "dot-resolved";
-                        actionText = `Status changed to <strong>Resolved</strong> by Admin.`;
-                    } else if (log.status?.toLowerCase() === "in progress") {
-                        dotClass = "dot-inprogress";
-                        actionText = `Status changed to <strong>In Progress</strong> by Admin.`;
-                    } else {
-                        dotClass = "dot-pending";
-                        actionText = index === 0 ? `<strong>Complaint Created</strong> by User.` : `Status reset to <strong>Pending</strong> by Admin.`;
-                    }
+                    if (log.status?.toLowerCase() === "resolved") { dotClass = "dot-resolved"; actionText = `Status changed to <strong>Resolved</strong> by Admin.`; }
+                    else if (log.status?.toLowerCase() === "in progress") { dotClass = "dot-inprogress"; actionText = `Status changed to <strong>In Progress</strong> by Admin.`; }
+                    else { dotClass = "dot-pending"; actionText = index === 0 ? `<strong>Complaint Created</strong> by User.` : `Status reset to <strong>Pending</strong> by Admin.`; }
 
                     html += `
                         <div class="timeline-item">
                             <div class="timeline-dot ${dotClass}"></div>
-                            <div class="timeline-content">
-                                ${actionText} <span class="timeline-time">${timeString}</span>
-                            </div>
-                        </div>
-                    `;
+                            <div class="timeline-content">${actionText} <span class="timeline-time">${timeString}</span></div>
+                        </div>`;
                 });
             }
             modalTimeline.innerHTML = html;
@@ -1344,32 +1397,26 @@
 
                     if (data) {
                         activeSelectedDocId = data.docId;
-
                         modalComplaintId.innerText = `Complaint #${data.complaintId || 'N/A'}`;
                         modalUser.innerText = data.userName || data.name || "Anonymous";
                         modalDept.innerText = data.category || "General";
                         modalSubject.innerText = data.title || "No Subject";
                         modalDesc.innerText = data.description || "No description provided.";
-
                         updateStatusSelect.value = data.status || "Pending";
 
                         if (data.createdAt) {
-                            const d = new Date(data.createdAt);
-                            modalDate.innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                            modalDate.innerText = new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         } else {
                             modalDate.innerText = "N/A";
                         }
-
-                        // Call timeline builder
                         renderTimeline(data);
-
                         detailsModal.classList.add("active");
                     }
                 });
             });
         }
 
-        // 5. SEARCH & MULTI-DROPDOWN FILTER LOGIC
+        // 🟢 ફિલ્ટર માટેનું સુધારેલું ફંક્શન
         function applyAdvancedFilters() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedDept = filterDeptSelect.value;
@@ -1381,41 +1428,41 @@
                     (item.title && item.title.toLowerCase().includes(searchTerm)) ||
                     (item.category && item.category.toLowerCase().includes(searchTerm));
 
-                const matchesDept = selectedDept === "All" ||
-                    (item.category && item.category.toLowerCase() === selectedDept.toLowerCase());
+                // Kitchen સિલેક્ટ કરવા પર Kitchen/Production પણ દેખાશે
+                const matchesDept = selectedDept === "All" || (item.category && item.category.toLowerCase().includes(selectedDept.toLowerCase()));
 
-                const matchesStatus = selectedStatus === "All" ||
-                    (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+                let matchesStatus = false;
+                if (selectedStatus === "All") {
+                    matchesStatus = item.status?.toLowerCase() !== "resolved";
+                } else {
+                    matchesStatus = (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+                }
 
                 return matchesSearch && matchesDept && matchesStatus;
             });
 
             renderDashboardTable(filteredData);
+
+            // ગ્રાફ લાઈવ ફિલ્ટર કરેલા ડેટા પ્રમાણે અપડેટ થશે
+            const filteredCounts = calculateDeptCounts(filteredData);
+            updateDashboardChart(filteredCounts);
         }
 
         searchInput.addEventListener("input", applyAdvancedFilters);
         filterDeptSelect.addEventListener("change", applyAdvancedFilters);
         filterStatusSelect.addEventListener("change", applyAdvancedFilters);
 
-        // VOICE SPEECH CONTROLLER
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.lang = 'en-US';
-            recognition.interimResults = false;
+            const recognition = new SpeechRecognition(); recognition.lang = 'en-US'; recognition.interimResults = false;
 
             btnVoiceCommand.addEventListener("click", () => {
-                if (btnVoiceCommand.classList.contains("listening")) {
-                    recognition.stop();
-                } else {
-                    btnVoiceCommand.classList.add("listening");
-                    recognition.start();
-                }
+                if (btnVoiceCommand.classList.contains("listening")) { recognition.stop(); }
+                else { btnVoiceCommand.classList.add("listening"); recognition.start(); }
             });
 
             recognition.onresult = (event) => {
                 const voiceText = event.results[0][0].transcript.toLowerCase().trim();
-
                 if (voiceText.includes("kitchen")) { filterDeptSelect.value = "Kitchen"; }
                 else if (voiceText.includes("electrical")) { filterDeptSelect.value = "Electrical"; }
                 else if (voiceText.includes("it")) { filterDeptSelect.value = "IT"; }
@@ -1427,71 +1474,99 @@
                 else if (voiceText.includes("resolved")) { filterStatusSelect.value = "Resolved"; }
 
                 if (voiceText.includes("clear") || voiceText.includes("reset")) {
-                    filterDeptSelect.value = "All";
-                    filterStatusSelect.value = "All";
-                    searchInput.value = "";
+                    filterDeptSelect.value = "All"; filterStatusSelect.value = "All"; searchInput.value = "";
                 } else if (!voiceText.includes("pending") && !voiceText.includes("progress") && !voiceText.includes("resolved") && !voiceText.includes("kitchen") && !voiceText.includes("it") && !voiceText.includes("electrical")) {
                     searchInput.value = voiceText;
                 }
-
                 applyAdvancedFilters();
             };
-
             recognition.onend = () => { btnVoiceCommand.classList.remove("listening"); };
             recognition.onerror = () => { btnVoiceCommand.classList.remove("listening"); };
         } else {
             btnVoiceCommand.style.display = "none";
         }
 
-        // 6. CLOSING THE MODAL WINDOWS
         btnCloseModal.addEventListener("click", () => detailsModal.classList.remove("active"));
         detailsModal.addEventListener("click", (e) => { if (e.target === detailsModal) detailsModal.classList.remove("active"); });
 
-        // 7. FIRESTORE WRITE TRANSACTION CONTROLLER (WITH ARRAYS HISTORY UNION)
+        btnExport.addEventListener("click", (e) => {
+            e.stopPropagation();
+            exportDropdownMenu.classList.toggle("show");
+        });
+        window.addEventListener("click", () => exportDropdownMenu.classList.remove("show"));
+
+        btnExportPDF.addEventListener("click", () => {
+            if (cachedComplaints.length === 0) { alert("No data to export."); return; }
+            document.getElementById("pdfGeneratedTimestamp").innerText = `Export Date: ${new Date().toLocaleString('en-GB')}`;
+
+            const targetSection = document.getElementById("hiddenPdfPrintSection");
+            targetSection.style.display = "block";
+
+            const pdfOptions = {
+                margin: [12, 12, 12, 12],
+                filename: `Akshaya_Patra_MasterReport.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(pdfOptions).from(targetSection).save().then(() => {
+                targetSection.style.display = "none";
+            }).catch((err) => {
+                console.error("PDF Crash Context:", err);
+                targetSection.style.display = "none";
+            });
+        });
+
+        btnExportExcel.addEventListener("click", () => {
+            if (cachedComplaints.length === 0) { alert("No data to export."); return; }
+            let csvRows = ["Complaint ID,Registered By,Department,Subject Title,Priority,Status,Created Date"];
+
+            cachedComplaints.forEach(item => {
+                let id = item.complaintId || 'N/A';
+                let name = (item.userName || item.name || 'Anonymous').replace(/,/g, " ");
+                let dept = (item.category || 'N/A').replace(/,/g, " ");
+                let subject = (item.title || 'No Subject').replace(/,/g, " ");
+                let priority = item.priority || "Medium";
+                let status = item.status || "Pending";
+                let dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : 'N/A';
+                csvRows.push(`"${id}","${name}","${dept}","${subject}","${priority}","${status}","${dateStr}"`);
+            });
+
+            const csvContent = "data:text/csv;charset=utf-8," + csvRows.join("\n");
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Akshaya_Patra_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
         btnUpdateTicket.addEventListener("click", async () => {
             if (!activeSelectedDocId) return;
-
             const currentSelectedStatus = updateStatusSelect.value;
             const currentComplaint = cachedComplaints.find(c => c.docId === activeSelectedDocId);
 
-            // Optimization Check: If status didn't change, stop execution to save query limits
             if (currentComplaint && currentComplaint.status === currentSelectedStatus) {
-                alert("Status is already set to " + currentSelectedStatus);
-                return;
+                alert("Status is already set to " + currentSelectedStatus); return;
             }
 
             btnUpdateTicket.disabled = true;
             btnUpdateTicket.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Updating...`;
-
             const currentTimestamp = new Date().toISOString();
-
-            // New Array Log Entity Object Setup
-            const newHistoryLog = {
-                status: currentSelectedStatus,
-                time: currentTimestamp
-            };
+            const newHistoryLog = { status: currentSelectedStatus, time: currentTimestamp };
 
             try {
                 const docRef = doc(db, "complaints", activeSelectedDocId);
+                let updatePayload = { status: currentSelectedStatus, updatedAt: currentTimestamp, history: arrayUnion(newHistoryLog) };
 
-                // Firestore Update Query Structure
-                let updatePayload = {
-                    status: currentSelectedStatus,
-                    updatedAt: currentTimestamp,
-                    history: arrayUnion(newHistoryLog) // Automatically push log to array stream
-                };
-
-                // Safety Handler: If old document doesn't have history array, initialize creation log along with it
                 if (!currentComplaint.history || currentComplaint.history.length === 0) {
-                    const originalCreationLog = {
-                        status: "Pending",
-                        time: currentComplaint.createdAt || currentTimestamp
-                    };
+                    const originalCreationLog = { status: "Pending", time: currentComplaint.createdAt || currentTimestamp };
                     updatePayload.history = [originalCreationLog, newHistoryLog];
                 }
 
                 await updateDoc(docRef, updatePayload);
-
                 alert("Status successfully updated and tracked!");
                 detailsModal.classList.remove("active");
             } catch (error) {
@@ -1501,23 +1576,6 @@
                 btnUpdateTicket.disabled = false;
                 btnUpdateTicket.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Update Status`;
             }
-        });
-
-        // 8. REPORT EXPORTER (CSV GENERATOR)
-        btnExport.addEventListener("click", () => {
-            if (cachedComplaints.length === 0) { alert("No data available to export."); return; }
-            let csvContent = "data:text/csv;charset=utf-8,ID,Department,Subject,Priority,Status\n";
-            cachedComplaints.forEach(c => {
-                csvContent += `"${c.complaintId || ''}","${c.category || ''}","${c.title || ''}","${c.priority || 'Medium'}","${c.status || ''}"\n`;
-            });
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Akshaya_Patra_Report_${new Date().toLocaleDateString()}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
         });
     </script>
 </body>
