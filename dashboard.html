@@ -1385,7 +1385,7 @@
 
                     const asset = await response.json();
 
-                    console.log("Asset Data:", assetData);
+                    console.log("Asset Data:", asset);
 
                     modalAssetTag.textContent = asset.asset_tag || "N/A";
                     modalAssetModel.textContent = asset.model || "N/A";
@@ -1394,8 +1394,6 @@
                     modalAssetStatus.textContent = asset.status || "N/A";
 
                     console.log(asset);
-
-                    as
 
                     if (data) {
                         activeSelectedDocId = data.docId;
