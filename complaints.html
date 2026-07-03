@@ -523,7 +523,6 @@
                 <option value="IT Support">IT Support</option>
                 <option value="Housekeeping">Housekeeping</option>
             </select>
-            <!-- કાઢી નાખેલ સ્ટેટસ ફિલ્ટરમાંથી 'Resolved' કારણ કે તે હવે ઓટોમેટીક રીમૂવ થઈ જાય છે -->
             <select class="filter-dropdown" id="statusFilter">
                 <option value="All">All Active Statuses</option>
                 <option value="Pending">Pending</option>
@@ -638,7 +637,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Global Firebase Configuration
+        // Global Firebase Configuration[cite: 11]
         const firebaseConfig = {
             apiKey: "AIzaSyCrne4zTG5Z5wrpps3N6WTX__WJREJ_r1I",
             authDomain: "akshayapatraassetmanagement.firebaseapp.com",
@@ -651,11 +650,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State Core Registries
+        // State Core Registries[cite: 11]
         let allComplaints = [];
         let activeSelectedDocId = null;
 
-        // UI Target DOM Pointers
+        // UI Target DOM Pointers[cite: 11]
         const tableBody = document.getElementById("complaintsTableBody");
         const searchFilter = document.getElementById("searchFilter");
         const deptFilter = document.getElementById("deptFilter");
@@ -678,7 +677,7 @@
         const updateRemarksText = document.getElementById("updateRemarksText");
         const btnUpdateTicket = document.getElementById("btnUpdateTicket");
 
-        // Fire-On Live Synced Continuous Snapshot Connection
+        // Fire-On Live Synced Continuous Snapshot Connection[cite: 11]
         onSnapshot(collection(db, "complaints"), (snapshot) => {
             allComplaints = [];
             if (snapshot.empty) {
@@ -693,7 +692,7 @@
             applyFilters();
         });
 
-        // Search & Filter Operations Pipeline Engine (Modified to Automatically Remove Resolved Complaints)
+        // Search & Filter Operations Pipeline Engine[cite: 11]
         function applyFilters() {
             const searchValue = searchFilter.value.toLowerCase().trim();
             const selectedDept = deptFilter.value;
@@ -702,7 +701,6 @@
             const filtered = allComplaints.filter(item => {
                 const status = item.status || "Pending";
 
-                // જો સ્ટેટસ 'Resolved' હોય તો તેને લિસ્ટમાંથી સીધું જ કાઢી નાખો (Remove)
                 if (status === "Resolved") {
                     return false;
                 }
@@ -723,7 +721,7 @@
             renderTable(filtered);
         }
 
-        // Render UI Table Interface Matrix
+        // Render UI Table Interface Matrix[cite: 11]
         function renderTable(dataArray) {
             tableBody.innerHTML = "";
             if (dataArray.length === 0) {
@@ -759,7 +757,7 @@
             attachViewClickHandlers();
         }
 
-        // Setup View Click to open Modal with all Details
+        // Setup View Click to open Modal with all Details[cite: 11]
         function attachViewClickHandlers() {
             const viewButtons = document.querySelectorAll(".btn-view-action");
             viewButtons.forEach(btn => {
@@ -771,10 +769,7 @@
                         activeSelectedDocId = data.docId;
                         modalComplaintId.innerText = `Complaint #${data.complaintId || data.id || 'N/A'}`;
                         modalUser.innerText = data.registeredBy || data.userName || data.name || "Anonymous";
-
-                        // *** USER EMAIL AUTO SEARCH DETECT SYSTEM ***
                         modalEmail.innerText = data.userEmail || data.email || data.registeredEmail || "Not Available";
-
                         modalDept.innerText = data.department || data.category || "General";
                         modalStatus.innerText = data.status || "Pending";
                         modalSubject.innerText = data.subject || data.title || "No Subject";
@@ -789,14 +784,24 @@
                             modalDate.innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         }
 
-                        // --- COMPLAINT HISTORY TIMELINE RENDERING ---
+                        // --- COMPLAINT HISTORY TIMELINE RENDERING (Sarkho karelo logic) ---
                         modalHistoryLog.innerHTML = "";
                         if (data.history && Array.isArray(data.history) && data.history.length > 0) {
                             data.history.forEach((log) => {
+                                let formattedTime = log.time;
+                                // જો ડેટાબેઝમાં ટાઈમ ISO ફોર્મેટમાં હોય તો તેને કન્વર્ટ કરો
+                                if (log.time && log.time.includes('T')) {
+                                    const d = new Date(log.time);
+                                    if (!isNaN(d.getTime())) {
+                                        formattedTime = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) +
+                                            " (" + d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ")";
+                                    }
+                                }
+
                                 modalHistoryLog.innerHTML += `
                                     <div>
                                         <span style="color: #d97706; font-weight: 700;">• Status Changed to ${log.status}:</span>
-                                        <span style="color: #64748b; font-size: 12.5px; margin-left: 6px;">${log.time}</span>
+                                        <span style="color: #64748b; font-size: 12.5px; margin-left: 6px;">${formattedTime}</span>
                                     </div>
                                 `;
                             });
@@ -820,7 +825,7 @@
             });
         }
 
-        // Administrative Core Database Mutation Processor Engine
+        // Administrative Core Database Mutation Processor Engine[cite: 11]
         btnUpdateTicket.addEventListener("click", async () => {
             if (!activeSelectedDocId) return;
 
@@ -830,13 +835,14 @@
             try {
                 const newStatus = updateStatusSelect.value;
                 const now = new Date();
+                // નવો સ્ટેટસ એડ કરતી વખતે પણ રીડેબલ ટાઇમ જ સેવ થશે
                 const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " (" + now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ")";
 
                 const docRef = doc(db, "complaints", activeSelectedDocId);
                 await updateDoc(docRef, {
                     status: newStatus,
                     adminRemarks: updateRemarksText.value.trim(),
-                    remarks: updateRemarksText.value.trim(), // Supports dual mapping schemas
+                    remarks: updateRemarksText.value.trim(),
                     history: arrayUnion({
                         status: newStatus,
                         time: timeString
@@ -855,12 +861,12 @@
             }
         });
 
-        // Event Listeners for Live Filters
+        // Event Listeners for Live Filters[cite: 11]
         searchFilter.addEventListener("input", applyFilters);
         deptFilter.addEventListener("change", applyFilters);
         statusFilter.addEventListener("change", applyFilters);
 
-        // Modal Close Setup
+        // Modal Close Setup[cite: 11]
         btnCloseModal.addEventListener("click", () => { detailsModal.classList.remove("active"); });
         detailsModal.addEventListener("click", (e) => { if (e.target === detailsModal) detailsModal.classList.remove("active"); });
     </script>
