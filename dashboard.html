@@ -1093,7 +1093,19 @@
             <div class="modal-info-item" style="margin-bottom: 8px;"><label>Subject</label>
                 <p id="modalSubject" style="font-weight: 600; font-size: 14.5px;"></p>
             </div>
-            <div class="modal-desc-box"><label>Detailed Problem Description</label>
+
+            <div class="asset-details">
+                <h4>Equipment Details</h4>
+
+                <p><strong>Asset Tag:</strong> <span id="modalAssetTag">Loading...</span></p>
+                <p><strong>Model:</strong> <span id="modalAssetModel">Loading...</span></p>
+                <p><strong>Manufacturer:</strong> <span id="modalAssetManufacturer">Loading...</span></p>
+                <p><strong>Location:</strong> <span id="modalAssetLocation">Loading...</span></p>
+                <p><strong>Status:</strong> <span id="modalAssetStatus">Loading...</span></p>
+            </div>
+
+            <div class="modal-desc-box">
+                <label>Detailed Problem Description</label>
                 <p id="modalDesc">No details provided.</p>
             </div>
 
@@ -1156,6 +1168,11 @@
         const detailsModal = document.getElementById("detailsModal");
         const btnCloseModal = document.getElementById("btnCloseModal");
         const modalComplaintId = document.getElementById("modalComplaintId");
+        const modalAssetTag = document.getElementById("modalAssetTag");
+        const modalAssetModel = document.getElementById("modalAssetModel");
+        const modalAssetManufacturer = document.getElementById("modalAssetManufacturer");
+        const modalAssetLocation = document.getElementById("modalAssetLocation");
+        const modalAssetStatus = document.getElementById("modalAssetStatus");
         const modalUser = document.getElementById("modalUser");
         const modalDept = document.getElementById("modalDept");
         const modalDate = document.getElementById("modalDate");
@@ -1353,9 +1370,30 @@
         function setupRowClickHandlers() {
             const rows = document.querySelectorAll(".clickable-row");
             rows.forEach(row => {
-                row.addEventListener("click", () => {
+                row.addEventListener("click", async () => {
                     const docId = row.getAttribute("data-id");
                     const data = cachedComplaints.find(item => item.docId === docId);
+
+                    console.log("Complaint Data:", data);
+                    console.log("Asset ID:", data.assetId);
+
+                    const response = await fetch(`http://localhost:3000/api/assets/${data.assetId}`);
+
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch asset details.");
+                    }
+
+                    const asset = await response.json();
+
+                    console.log("Asset Data:", asset);
+
+                    modalAssetTag.textContent = asset.asset_tag || "N/A";
+                    modalAssetModel.textContent = asset.model || "N/A";
+                    modalAssetManufacturer.textContent = asset.manufacturer || "N/A";
+                    modalAssetLocation.textContent = asset.location || "N/A";
+                    modalAssetStatus.textContent = asset.status || "N/A";
+
+                    console.log(asset);
 
                     if (data) {
                         activeSelectedDocId = data.docId;
@@ -1370,6 +1408,33 @@
                             modalDate.innerText = new Date(data.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         } else {
                             modalDate.innerText = "N/A";
+                        }
+                        // Load latest asset details from Snipe-IT
+                        if (data.assetId) {
+                            try {
+                                const response = await fetch(`http://localhost:3000/api/assets/${data.assetId}`);
+
+                                if (response.ok) {
+                                    const asset = await response.json();
+
+                                    document.getElementById("modalAssetTag").innerText =
+                                        asset.asset_tag || "N/A";
+
+                                    document.getElementById("modalAssetModel").innerText =
+                                        asset.model || "N/A";
+
+                                    document.getElementById("modalAssetManufacturer").innerText =
+                                        asset.manufacturer || "N/A";
+
+                                    document.getElementById("modalAssetLocation").innerText =
+                                        asset.location || "N/A";
+
+                                    document.getElementById("modalAssetStatus").innerText =
+                                        asset.status || "N/A";
+                                }
+                            } catch (err) {
+                                console.error("Failed to fetch asset:", err);
+                            }
                         }
                         renderTimeline(data);
                         detailsModal.classList.add("active");
