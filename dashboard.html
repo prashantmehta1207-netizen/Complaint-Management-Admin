@@ -200,7 +200,7 @@
             background-color: var(--border-color);
         }
 
-        /* 🟢 DROPDOWN ACTIONS STYLING */
+        /* DROPDOWN ACTIONS STYLING */
         .dropdown-wrapper {
             position: relative;
             display: inline-block;
@@ -278,8 +278,6 @@
                 box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
             }
         }
-
-        /* <--- Aa main bracket missing hatu, jene lidhe bug aavto hato! */
 
         /* --- CRITICAL ALERT SYSTEM BOX --- */
         .alert-box {
@@ -811,7 +809,7 @@
             background-color: var(--primary-light);
         }
 
-        /* 🟢 HIDDEN MASTER PDF VIEW REGISTRY STYLING */
+        /* HIDDEN MASTER PDF VIEW REGISTRY STYLING */
         #hiddenPdfPrintSection {
             display: none;
             background-color: #ffffff !important;
@@ -1210,21 +1208,20 @@
             }
 
             applyAdvancedFilters();
-            renderMasterPdfHiddenData(cachedComplaints);
-            const deptCounts = calculateDeptCounts(cachedComplaints);
-            updateDashboardChart(deptCounts);
-
-            if (activeSelectedDocId && detailsModal.classList.contains("active")) {
-                const currentData = cachedComplaints.find(item => item.docId === activeSelectedDocId);
-                if (currentData) renderTimeline(currentData);
-            }
         });
 
+        // 🟢 સુધારેલું કાઉન્ટ ફંક્શન: જે Kitchen અને Kitchen/Production બંનેને ગણતરીમાં લેશે
         function calculateDeptCounts(dataArray) {
             const counts = { "kitchen": 0, "it": 0, "electrical": 0, "maintenance": 0, "mechanical": 0 };
             dataArray.forEach(item => {
-                const deptKey = item.category ? item.category.toLowerCase().trim().replace(/[\s\/]/g, '') : "";
-                if (counts[deptKey] !== undefined) { counts[deptKey]++; }
+                let deptStr = item.category ? item.category.toLowerCase().trim() : "";
+
+                if (deptStr.includes("kitchen")) {
+                    counts["kitchen"]++;
+                } else {
+                    const deptKey = deptStr.replace(/[\s\/]/g, '');
+                    if (counts[deptKey] !== undefined) { counts[deptKey]++; }
+                }
             });
             return counts;
         }
@@ -1295,24 +1292,6 @@
                     }
                 });
             }
-        }
-
-        function renderMasterPdfHiddenData(dataArray) {
-            let html = "";
-            dataArray.forEach((item) => {
-                let formattedDate = item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB') : 'N/A';
-                html += `
-                    <tr>
-                        <td>#${item.complaintId || 'N/A'}</td>
-                        <td>${item.userName || item.name || 'Anonymous'}</td>
-                        <td>${item.category || 'N/A'}</td>
-                        <td>${item.title || 'No Subject'}</td>
-                        <td>${item.priority || 'Medium'}</td>
-                        <td><strong>${item.status || 'Pending'}</strong></td>
-                        <td>${formattedDate}</td>
-                    </tr>`;
-            });
-            pdfMasterTableBody.innerHTML = html || '<tr><td colspan="7" style="text-align:center; padding:20px;">No dataset compiled.</td></tr>';
         }
 
         function startSLACountdown(docId, createdAtStr) {
@@ -1399,6 +1378,7 @@
             });
         }
 
+        // 🟢 ફિલ્ટર માટેનું સુધારેલું ફંક્શન
         function applyAdvancedFilters() {
             const searchTerm = searchInput.value.toLowerCase().trim();
             const selectedDept = filterDeptSelect.value;
@@ -1409,11 +1389,25 @@
                     (item.complaintId && item.complaintId.toString().toLowerCase().includes(searchTerm)) ||
                     (item.title && item.title.toLowerCase().includes(searchTerm)) ||
                     (item.category && item.category.toLowerCase().includes(searchTerm));
-                const matchesDept = selectedDept === "All" || (item.category && item.category.toLowerCase() === selectedDept.toLowerCase());
-                const matchesStatus = selectedStatus === "All" || (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+
+                // Kitchen સિલેક્ટ કરવા પર Kitchen/Production પણ દેખાશે
+                const matchesDept = selectedDept === "All" || (item.category && item.category.toLowerCase().includes(selectedDept.toLowerCase()));
+
+                let matchesStatus = false;
+                if (selectedStatus === "All") {
+                    matchesStatus = item.status?.toLowerCase() !== "resolved";
+                } else {
+                    matchesStatus = (item.status && item.status.toLowerCase() === selectedStatus.toLowerCase());
+                }
+
                 return matchesSearch && matchesDept && matchesStatus;
             });
+
             renderDashboardTable(filteredData);
+
+            // ગ્રાફ લાઈવ ફિલ્ટર કરેલા ડેટા પ્રમાણે અપડેટ થશે
+            const filteredCounts = calculateDeptCounts(filteredData);
+            updateDashboardChart(filteredCounts);
         }
 
         searchInput.addEventListener("input", applyAdvancedFilters);
@@ -1457,14 +1451,12 @@
         btnCloseModal.addEventListener("click", () => detailsModal.classList.remove("active"));
         detailsModal.addEventListener("click", (e) => { if (e.target === detailsModal) detailsModal.classList.remove("active"); });
 
-        // 🟢 DROPDOWN TOGGLER INTERACTION LOGIC
         btnExport.addEventListener("click", (e) => {
             e.stopPropagation();
             exportDropdownMenu.classList.toggle("show");
         });
         window.addEventListener("click", () => exportDropdownMenu.classList.remove("show"));
 
-        // 🟢 PROPER DYNAMIC PDF EXPORT UTILITY
         btnExportPDF.addEventListener("click", () => {
             if (cachedComplaints.length === 0) { alert("No data to export."); return; }
             document.getElementById("pdfGeneratedTimestamp").innerText = `Export Date: ${new Date().toLocaleString('en-GB')}`;
@@ -1488,7 +1480,6 @@
             });
         });
 
-        // 🟢 PROPER DYNAMIC EXCEL EXPORT UTILITY
         btnExportExcel.addEventListener("click", () => {
             if (cachedComplaints.length === 0) { alert("No data to export."); return; }
             let csvRows = ["Complaint ID,Registered By,Department,Subject Title,Priority,Status,Created Date"];
