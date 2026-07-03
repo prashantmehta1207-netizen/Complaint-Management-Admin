@@ -14,6 +14,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
+        :root {
+            --sidebar-width: 260px;
+            --primary-color: #064e35;
+            --primary-light: #0b6643;
+            --accent-color: #8dc63f;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -23,12 +30,105 @@
 
         body {
             background-color: #f4f6f9;
-            padding: 20px;
+            display: flex;
+            min-height: 100vh;
         }
 
-        .container {
-            max-width: 1200px;
+        /* --- SIDEBAR STYLING --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            z-index: 100;
+        }
+
+        .sidebar-brand {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background-color: #ffffff;
+        }
+
+        .sidebar-logo {
+            width: 100%;
+            max-width: 160px;
+            height: auto;
+            display: block;
             margin: 0 auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 20px 0;
+            flex: 1;
+        }
+
+        .sidebar-menu li a {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            color: #cbd5e1;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 4px 16px;
+            border-radius: 8px;
+        }
+
+        .sidebar-menu li a i {
+            margin-right: 15px;
+            font-size: 18px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .sidebar-menu li.active a,
+        .sidebar-menu li a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        .sidebar-menu li.active a {
+            background-color: var(--primary-light);
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .sidebar-footer {
+            padding: 24px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-logout {
+            width: 100%;
+            background-color: #d9534f;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        /* CONTAINER ADJUSTMENT */
+        .container {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 40px;
+            max-width: calc(100% - var(--sidebar-width));
         }
 
         .header {
@@ -118,18 +218,6 @@
             margin-bottom: 20px;
         }
 
-        @media (max-width: 768px) {
-            .charts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .filter-section {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-        }
-
         .chart-card {
             background: #fff;
             padding: 20px;
@@ -152,7 +240,6 @@
             width: 100%;
         }
 
-        /* 🛠️ PDF અને વેબ બંનેમાં પ્રોપર ફિટિંગ માટે ટેબલ કાર્ડના CSS */
         .table-card {
             background: #fff;
             padding: 20px;
@@ -167,7 +254,6 @@
             border-collapse: collapse;
             text-align: left;
             table-layout: fixed;
-            /* 👈 આનાથી બધી કોલમ આપણી આપેલી સાઈઝમાં જ ફિટ થશે */
         }
 
         th,
@@ -176,7 +262,6 @@
             border-bottom: 1px solid #e0e0e0;
             color: #555;
             word-wrap: break-word;
-            /* લાંબી ટેક્સ્ટ હોય તો ઓટોમેટિક નીચે આવી જશે */
             font-size: 14px;
         }
 
@@ -187,7 +272,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* 🛠️ દરેક કોલમની વિડ્થ (Width) ફિક્સ કરી દીધી જેથી છેલ્લી કોલમ કપાય નહીં */
         .col-id {
             width: 15%;
         }
@@ -229,10 +313,87 @@
             background-color: #198754;
             color: #fff;
         }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-brand,
+            .sidebar-menu span,
+            .btn-logout span,
+            .sidebar-footer {
+                display: none;
+            }
+
+            .container {
+                margin-left: 70px;
+                max-width: calc(100% - 70px);
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .sidebar-brand,
+            .sidebar-menu span,
+            .btn-logout span,
+            .sidebar-footer {
+                display: block;
+            }
+
+            .sidebar-brand {
+                display: flex;
+                justify-content: center;
+            }
+
+            .container {
+                margin-left: 0;
+                max-width: 100%;
+                padding: 20px;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-section {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 
 <body>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <img src="image.png" alt="Akshaya Patra Logo" class="sidebar-logo">
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span></a></li>
+            <li><a href="complaints.html"><i class="fa-regular fa-clipboard"></i> <span>Complaints</span></a></li>
+            <li><a href="profile.html"><i class="fa-regular fa-user"></i> <span>Profile</span></a></li>
+            <li class="active"><a href="analysis.html"><i class="fa-solid fa-chart-line"></i> <span>Analysis</span></a>
+            </li>
+        </ul>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="index.html" class="btn-logout">
+                <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+            </a>
+        </div>
+    </div>
 
     <div class="container">
         <!-- Header -->
@@ -275,7 +436,6 @@
 
         <!-- Charts Grid Area -->
         <div class="charts-grid">
-            <!-- Monthly Trend Chart -->
             <div class="chart-card">
                 <h3><i class="fa-solid fa-calendar-days"></i> Monthly Complaints Trend</h3>
                 <div class="chart-container">
@@ -283,7 +443,6 @@
                 </div>
             </div>
 
-            <!-- 5 Departments Share Chart -->
             <div class="chart-card">
                 <h3><i class="fa-solid fa-building"></i> Department Share</h3>
                 <div class="chart-container">
@@ -312,7 +471,6 @@
                 </tbody>
             </table>
         </div>
-
     </div>
 
     <!-- Firebase SDKs -->
@@ -511,7 +669,6 @@
             }
         }
 
-        // Real-time Firebase Link
         db.collection("complaints").onSnapshot((snapshot) => {
             let complaints = [];
             snapshot.forEach(doc => {
@@ -529,26 +686,18 @@
             console.error("Firebase Sync Failure:", error);
         });
 
-        // PDF Export - પરફેક્ટ વિડ્થ સેટિંગ સાથે
         document.getElementById('downloadPDF').addEventListener('click', () => {
             const element = document.getElementById('onlyTableArea');
             const opt = {
-                margin: [15, 12, 15, 12], // પ્રોપર લેફ્ટ-રાઇટ માર્જિન સેટ કર્યું
+                margin: [15, 12, 15, 12],
                 filename: 'Complaints_Table_Report.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    scrollY: 0,
-                    scrollX: 0,
-                    letterRendering: true,
-                    useCORS: true
-                },
+                html2canvas: { scale: 2, scrollY: 0, scrollX: 0, letterRendering: true, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
         });
 
-        // CSV Export
         document.getElementById('downloadExcel').addEventListener('click', () => {
             if (filteredComplaintsGlobal.length === 0) return alert("No data available to export!");
 
