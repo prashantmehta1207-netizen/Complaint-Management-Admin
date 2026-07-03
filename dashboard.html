@@ -1332,6 +1332,8 @@
 
                     const asset = await response.json();
 
+                    console.log("Asset Data:", assetData);
+
                     modalAssetTag.textContent = asset.asset_tag || "N/A";
                     modalAssetModel.textContent = asset.model || "N/A";
                     modalAssetManufacturer.textContent = asset.manufacturer || "N/A";
