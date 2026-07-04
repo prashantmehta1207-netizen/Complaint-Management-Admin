@@ -517,16 +517,18 @@
             </div>
             <select class="filter-dropdown" id="deptFilter">
                 <option value="All">All Departments</option>
-                <option value="Mechanical">Mechanical</option>
+                <option value="Kitchen">Kitchen</option>
+                <option value="IT">IT</option>
                 <option value="Electrical">Electrical</option>
-                <option value="Plumbing">Plumbing</option>
-                <option value="IT Support">IT Support</option>
-                <option value="Housekeeping">Housekeeping</option>
+                <option value="Maintenance">Maintenance</option>
+                <option value="Mechanical">Mechanical</option>
+                <option value="General">General</option>
             </select>
             <select class="filter-dropdown" id="statusFilter">
-                <option value="All">All Active Statuses</option>
+                <option value="All">All Statuses</option>
                 <option value="Pending">Pending</option>
                 <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
             </select>
         </div>
 
@@ -637,7 +639,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-        // Global Firebase Configuration[cite: 11]
+        // Global Firebase Configuration[cite: 4]
         const firebaseConfig = {
             apiKey: "AIzaSyCrne4zTG5Z5wrpps3N6WTX__WJREJ_r1I",
             authDomain: "akshayapatraassetmanagement.firebaseapp.com",
@@ -650,11 +652,11 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // State Core Registries[cite: 11]
+        // State Core Registries[cite: 4]
         let allComplaints = [];
         let activeSelectedDocId = null;
 
-        // UI Target DOM Pointers[cite: 11]
+        // UI Target DOM Pointers[cite: 4]
         const tableBody = document.getElementById("complaintsTableBody");
         const searchFilter = document.getElementById("searchFilter");
         const deptFilter = document.getElementById("deptFilter");
@@ -677,7 +679,7 @@
         const updateRemarksText = document.getElementById("updateRemarksText");
         const btnUpdateTicket = document.getElementById("btnUpdateTicket");
 
-        // Fire-On Live Synced Continuous Snapshot Connection[cite: 11]
+        // Fire-On Live Synced Continuous Snapshot Connection[cite: 4]
         onSnapshot(collection(db, "complaints"), (snapshot) => {
             allComplaints = [];
             if (snapshot.empty) {
@@ -692,7 +694,7 @@
             applyFilters();
         });
 
-        // Search & Filter Operations Pipeline Engine[cite: 11]
+        // Search & Filter Operations Pipeline Engine[cite: 4]
         function applyFilters() {
             const searchValue = searchFilter.value.toLowerCase().trim();
             const selectedDept = deptFilter.value;
@@ -701,9 +703,8 @@
             const filtered = allComplaints.filter(item => {
                 const status = item.status || "Pending";
 
-                if (status === "Resolved") {
-                    return false;
-                }
+                // જો Resolved કમ્પ્લેઇન્ટ્સ પણ જોવી હોય તો આ લાઇન ચેક કરવી
+                // જો હાઇડ કરવી હોય તો રાખવી, અત્યારે બધી જ બતાવવા માટે ફિલ્ટર પ્રોપર રન થશે.
 
                 const cId = (item.complaintId || item.id || "").toLowerCase();
                 const subject = (item.subject || item.title || "").toLowerCase();
@@ -721,7 +722,7 @@
             renderTable(filtered);
         }
 
-        // Render UI Table Interface Matrix[cite: 11]
+        // Render UI Table Interface Matrix[cite: 4]
         function renderTable(dataArray) {
             tableBody.innerHTML = "";
             if (dataArray.length === 0) {
@@ -757,7 +758,7 @@
             attachViewClickHandlers();
         }
 
-        // Setup View Click to open Modal with all Details[cite: 11]
+        // Setup View Click to open Modal with all Details[cite: 4]
         function attachViewClickHandlers() {
             const viewButtons = document.querySelectorAll(".btn-view-action");
             viewButtons.forEach(btn => {
@@ -784,12 +785,11 @@
                             modalDate.innerText = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
                         }
 
-                        // --- COMPLAINT HISTORY TIMELINE RENDERING (Sarkho karelo logic) ---
+                        // --- COMPLAINT HISTORY TIMELINE RENDERING ---
                         modalHistoryLog.innerHTML = "";
                         if (data.history && Array.isArray(data.history) && data.history.length > 0) {
                             data.history.forEach((log) => {
                                 let formattedTime = log.time;
-                                // જો ડેટાબેઝમાં ટાઈમ ISO ફોર્મેટમાં હોય તો તેને કન્વર્ટ કરો
                                 if (log.time && log.time.includes('T')) {
                                     const d = new Date(log.time);
                                     if (!isNaN(d.getTime())) {
@@ -825,7 +825,7 @@
             });
         }
 
-        // Administrative Core Database Mutation Processor Engine[cite: 11]
+        // Administrative Core Database Mutation Processor Engine[cite: 4]
         btnUpdateTicket.addEventListener("click", async () => {
             if (!activeSelectedDocId) return;
 
@@ -835,7 +835,6 @@
             try {
                 const newStatus = updateStatusSelect.value;
                 const now = new Date();
-                // નવો સ્ટેટસ એડ કરતી વખતે પણ રીડેબલ ટાઇમ જ સેવ થશે
                 const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + " (" + now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ")";
 
                 const docRef = doc(db, "complaints", activeSelectedDocId);
@@ -861,12 +860,12 @@
             }
         });
 
-        // Event Listeners for Live Filters[cite: 11]
+        // Event Listeners for Live Filters[cite: 4]
         searchFilter.addEventListener("input", applyFilters);
         deptFilter.addEventListener("change", applyFilters);
         statusFilter.addEventListener("change", applyFilters);
 
-        // Modal Close Setup[cite: 11]
+        // Modal Close Setup[cite: 4]
         btnCloseModal.addEventListener("click", () => { detailsModal.classList.remove("active"); });
         detailsModal.addEventListener("click", (e) => { if (e.target === detailsModal) detailsModal.classList.remove("active"); });
     </script>
